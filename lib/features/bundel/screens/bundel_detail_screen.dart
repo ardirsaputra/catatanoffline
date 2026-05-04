@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../shared/models/bundel_model.dart';
 import '../../../shared/models/berkas_model.dart';
 import '../../../shared/utils/date_formatter.dart';
@@ -74,7 +73,7 @@ class BundelDetailScreen extends ConsumerWidget {
                     children: [
                       Text(
                         currentBundle.title,
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(fontFamily: 'Poppins', 
                           fontWeight: FontWeight.w700,
                           fontSize: 16,
                         ),
@@ -82,14 +81,14 @@ class BundelDetailScreen extends ConsumerWidget {
                       if (currentBundle.description.isNotEmpty)
                         Text(
                           currentBundle.description,
-                          style: GoogleFonts.poppins(
+                          style: TextStyle(fontFamily: 'Poppins', 
                             fontSize: 13,
                             color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       Text(
                         '${berkasInBundle.length} berkas · ${DateFormatter.formatRelative(currentBundle.updatedAt)}',
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(fontFamily: 'Poppins', 
                           fontSize: 12,
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -108,7 +107,7 @@ class BundelDetailScreen extends ConsumerWidget {
               children: [
                 Text(
                   'Berkas dalam Bundel',
-                  style: GoogleFonts.poppins(
+                  style: TextStyle(fontFamily: 'Poppins', 
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
@@ -131,7 +130,7 @@ class BundelDetailScreen extends ConsumerWidget {
                         Text(
                           'Bundel ini kosong\nTambahkan berkas ke dalam bundel',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
+                          style: TextStyle(fontFamily: 'Poppins', 
                             color: colorScheme.onSurfaceVariant,
                             height: 1.6,
                           ),
@@ -207,7 +206,7 @@ class BundelDetailScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             child: Text(
               'Tambah Berkas ke Bundel',
-              style: GoogleFonts.poppins(
+              style: TextStyle(fontFamily: 'Poppins', 
                   fontSize: 16, fontWeight: FontWeight.w700),
             ),
           ),
@@ -292,7 +291,7 @@ class _BerkasInBundelItem extends StatelessWidget {
           children: [
             Text(
               '$index',
-              style: GoogleFonts.poppins(
+              style: TextStyle(fontFamily: 'Poppins', 
                 fontWeight: FontWeight.w700,
                 color: colorScheme.primary,
                 fontSize: 14,
@@ -304,7 +303,7 @@ class _BerkasInBundelItem extends StatelessWidget {
           ],
         ),
         title: Text(berkas.title,
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+            style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
         subtitle: Text('${berkas.sections.length} bagian'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

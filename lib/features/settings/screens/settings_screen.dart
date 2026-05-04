@@ -1,7 +1,6 @@
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../app/theme/color_schemes.dart';
 import '../../../features/berkas/providers/category_provider.dart';
 import '../../../shared/models/category_model.dart';
@@ -20,7 +19,7 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(
           'Pengaturan',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
+          style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w700),
         ),
         elevation: 0,
       ),
@@ -186,7 +185,7 @@ class _SectionHeader extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             title,
-            style: GoogleFonts.poppins(
+            style: TextStyle(fontFamily: 'Poppins', 
               fontWeight: FontWeight.w700,
               fontSize: 13,
               color: Theme.of(context).colorScheme.primary,
@@ -216,8 +215,8 @@ class _SwitchTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SwitchListTile(
-      title: Text(title, style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
-      subtitle: Text(subtitle, style: GoogleFonts.poppins(fontSize: 12)),
+      title: Text(title, style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w500)),
+      subtitle: Text(subtitle, style: TextStyle(fontFamily: 'Poppins', fontSize: 12)),
       secondary: Icon(icon),
       value: value,
       onChanged: onChanged,
@@ -246,8 +245,8 @@ class _ChoiceTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: Icon(icon),
-      title: Text(title, style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
-      subtitle: Text(subtitle, style: GoogleFonts.poppins(fontSize: 12)),
+      title: Text(title, style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w500)),
+      subtitle: Text(subtitle, style: TextStyle(fontFamily: 'Poppins', fontSize: 12)),
       trailing: Icon(Icons.arrow_forward_ios,
           size: 14, color: Theme.of(context).colorScheme.outline),
       onTap: () {
@@ -260,7 +259,7 @@ class _ChoiceTile extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Text(
                   title,
-                  style: GoogleFonts.poppins(
+                  style: TextStyle(fontFamily: 'Poppins', 
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                   ),
@@ -305,7 +304,7 @@ class _ThemePresetTile extends StatelessWidget {
     return ListTile(
       leading: const Icon(Icons.palette_outlined),
       title: Text('Tema Warna',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
+          style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w500)),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -392,7 +391,7 @@ class _CategoryManagerTile extends ConsumerWidget {
                 ),
               ),
               title: Text(cat.name,
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
+                  style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w500)),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -421,7 +420,7 @@ class _CategoryManagerTile extends ConsumerWidget {
             child: const Icon(Icons.add, size: 20),
           ),
           title: Text('Tambah Kategori',
-              style: GoogleFonts.poppins(
+              style: TextStyle(fontFamily: 'Poppins', 
                   color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w600)),
           onTap: () => _showCategoryForm(context, watchRef, null),
@@ -551,7 +550,7 @@ class _CategoryFormState extends State<_CategoryForm> {
             padding: const EdgeInsets.all(16),
             child: Text(
               widget.existing == null ? 'Tambah Kategori' : 'Edit Kategori',
-              style: GoogleFonts.poppins(
+              style: TextStyle(fontFamily: 'Poppins', 
                   fontSize: 18, fontWeight: FontWeight.w700),
             ),
           ),
@@ -576,7 +575,7 @@ class _CategoryFormState extends State<_CategoryForm> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text('Pilih Ikon',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
           ),
           const SizedBox(height: 8),
           SizedBox(
@@ -618,7 +617,7 @@ class _CategoryFormState extends State<_CategoryForm> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text('Pilih Warna',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
           ),
           const SizedBox(height: 8),
           _ColorSwatches(

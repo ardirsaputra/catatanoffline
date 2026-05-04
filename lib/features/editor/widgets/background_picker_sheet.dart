@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import '../../../shared/models/berkas_model.dart';
 
@@ -66,14 +65,14 @@ class _BackgroundPickerSheetState extends State<BackgroundPickerSheet> {
           children: [
             Text(
               'Latar Belakang Editor',
-              style: GoogleFonts.poppins(
+              style: TextStyle(fontFamily: 'Poppins', 
                   fontSize: 16, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 20),
 
             // Type selector
             Text('Pola',
-                style: GoogleFonts.poppins(
+                style: TextStyle(fontFamily: 'Poppins', 
                     fontSize: 13, fontWeight: FontWeight.w600)),
             const SizedBox(height: 10),
             Row(
@@ -115,7 +114,7 @@ class _BackgroundPickerSheetState extends State<BackgroundPickerSheet> {
 
             // Preset colors
             Text('Warna Dasar',
-                style: GoogleFonts.poppins(
+                style: TextStyle(fontFamily: 'Poppins', 
                     fontSize: 13, fontWeight: FontWeight.w600)),
             const SizedBox(height: 10),
             Wrap(
@@ -158,7 +157,7 @@ class _BackgroundPickerSheetState extends State<BackgroundPickerSheet> {
             // Custom color picker
             ExpansionTile(
               title: Text('Warna Kustom',
-                  style: GoogleFonts.poppins(
+                  style: TextStyle(fontFamily: 'Poppins', 
                       fontSize: 13, fontWeight: FontWeight.w600)),
               tilePadding: EdgeInsets.zero,
               children: [
@@ -238,7 +237,7 @@ class _TypeButton extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 label,
-                style: GoogleFonts.poppins(
+                style: TextStyle(fontFamily: 'Poppins', 
                   fontSize: 11,
                   fontWeight:
                       selected ? FontWeight.w600 : FontWeight.normal,

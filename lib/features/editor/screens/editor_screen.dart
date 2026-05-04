@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../shared/models/section_model.dart';
 import '../../../shared/models/berkas_model.dart';
 import '../../../shared/widgets/background_painter.dart';
@@ -74,7 +73,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             ? TextField(
                 controller: _titleController,
                 autofocus: true,
-                style: GoogleFonts.poppins(
+                style: TextStyle(fontFamily: 'Poppins', 
                     fontWeight: FontWeight.w600, fontSize: 16),
                 decoration: const InputDecoration(
                   border: InputBorder.none,
@@ -95,7 +94,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 onTap: () => setState(() => _titleEditing = true),
                 child: Text(
                   berkas.title,
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                  style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
                 ),
               ),
         actions: [
@@ -306,7 +305,7 @@ class _EmptyEditor extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'Belum Ada Bagian',
-            style: GoogleFonts.poppins(
+            style: TextStyle(fontFamily: 'Poppins', 
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: colorScheme.onSurface,
@@ -316,7 +315,7 @@ class _EmptyEditor extends StatelessWidget {
           Text(
             'Tekan tombol + untuk menambahkan\nbagian pertama ke berkas ini.',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: TextStyle(fontFamily: 'Poppins', 
               color: colorScheme.onSurfaceVariant,
               height: 1.6,
             ),
@@ -356,7 +355,7 @@ class _ExportOptionsDialogState extends State<_ExportOptionsDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Orientasi Halaman',
-                style: GoogleFonts.poppins(
+                style: TextStyle(fontFamily: 'Poppins', 
                     fontWeight: FontWeight.w600, fontSize: 13)),
             RadioListTile(
               title: const Text('Portrait'),
@@ -391,7 +390,7 @@ class _ExportOptionsDialogState extends State<_ExportOptionsDialog> {
             ),
             const Divider(),
             Text('Font',
-                style: GoogleFonts.poppins(
+                style: TextStyle(fontFamily: 'Poppins', 
                     fontWeight: FontWeight.w600, fontSize: 13)),
             RadioListTile(
               title: const Text('Times New Roman'),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../../shared/models/section_model.dart';
 import 'package:uuid/uuid.dart';
 
@@ -126,7 +125,7 @@ class _PilihanGandaWidgetState extends State<PilihanGandaWidget> {
                       ),
                       child: Text(
                         'P${qIdx + 1}',
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(fontFamily: 'Poppins', 
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: colorScheme.primary,
@@ -151,7 +150,7 @@ class _PilihanGandaWidgetState extends State<PilihanGandaWidget> {
                     _questions[qIdx]['question'] = v;
                     _update();
                   },
-                  style: GoogleFonts.poppins(
+                  style: TextStyle(fontFamily: 'Poppins', 
                       fontWeight: FontWeight.w600, fontSize: 14),
                   decoration: const InputDecoration(
                     hintText: 'Tulis pertanyaan...',
@@ -206,7 +205,7 @@ class _PilihanGandaWidgetState extends State<PilihanGandaWidget> {
                               _questions[qIdx]['options'] = opts;
                               _update();
                             },
-                            style: GoogleFonts.poppins(
+                            style: TextStyle(fontFamily: 'Poppins', 
                               fontSize: 13,
                               fontWeight: isSelected
                                   ? FontWeight.w600

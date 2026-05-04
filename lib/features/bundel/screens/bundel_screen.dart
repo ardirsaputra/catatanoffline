@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../shared/models/bundel_model.dart';
 import '../../../shared/utils/date_formatter.dart';
 import '../../../shared/widgets/empty_state.dart';
@@ -31,8 +30,7 @@ class BundelScreen extends ConsumerWidget {
           ? EmptyStateWidget(
               emoji: '📦',
               title: 'Belum Ada Bundel',
-              subtitle:
-                  'Bundel memungkinkan Anda menggabungkan\nbeberapa berkas menjadi satu dokumen.',
+              subtitle: 'Bundel memungkinkan Anda menggabungkan\nbeberapa berkas menjadi satu dokumen.',
               actionLabel: 'Buat Bundel',
               onAction: () => _showCreateDialog(context, ref),
             )
@@ -46,8 +44,7 @@ class BundelScreen extends ConsumerWidget {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>
-                          BundelDetailScreen(bundle: bundle),
+                      builder: (_) => BundelDetailScreen(bundle: bundle),
                     ),
                   ),
                   onDelete: () => _confirmDelete(context, ref, bundle),
@@ -55,6 +52,7 @@ class BundelScreen extends ConsumerWidget {
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'fab_bundel',
         onPressed: () => _showCreateDialog(context, ref),
         icon: const Icon(Icons.add),
         label: const Text('Buat Bundel'),
@@ -99,20 +97,16 @@ class BundelScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _confirmDelete(
-      BuildContext context, WidgetRef ref, BundelModel bundle) async {
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref, BundelModel bundle) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Hapus Bundel?'),
         content: Text('Bundel "${bundle.title}" akan dihapus.'),
         actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
           TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Batal')),
-          TextButton(
-            style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error),
+            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Hapus'),
           ),
@@ -156,8 +150,7 @@ class _BundelCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Center(
-                  child:
-                      Text('📦', style: TextStyle(fontSize: 26)),
+                  child: Text('📦', style: TextStyle(fontSize: 26)),
                 ),
               ),
               const SizedBox(width: 14),
@@ -167,7 +160,8 @@ class _BundelCard extends StatelessWidget {
                   children: [
                     Text(
                       bundle.title,
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
                         fontWeight: FontWeight.w600,
                         fontSize: 15,
                         color: colorScheme.onSurface,
@@ -176,7 +170,8 @@ class _BundelCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       '${bundle.berkasIds.length} berkas · ${DateFormatter.formatShort(bundle.updatedAt)}',
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
                         fontSize: 12,
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -185,7 +180,8 @@ class _BundelCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         bundle.description,
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
                           fontSize: 12,
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -197,13 +193,10 @@ class _BundelCard extends StatelessWidget {
                 ),
               ),
               PopupMenuButton<String>(
-                icon:
-                    Icon(Icons.more_vert, color: colorScheme.onSurfaceVariant),
+                icon: Icon(Icons.more_vert, color: colorScheme.onSurfaceVariant),
                 itemBuilder: (_) => const [
-                  PopupMenuItem(
-                      value: 'open', child: Text('Buka')),
-                  PopupMenuItem(
-                      value: 'delete', child: Text('Hapus')),
+                  PopupMenuItem(value: 'open', child: Text('Buka')),
+                  PopupMenuItem(value: 'delete', child: Text('Hapus')),
                 ],
                 onSelected: (v) {
                   if (v == 'open') onTap();
@@ -223,8 +216,7 @@ class _CreateBundelSheet extends ConsumerStatefulWidget {
   const _CreateBundelSheet({required this.onCreated});
 
   @override
-  ConsumerState<_CreateBundelSheet> createState() =>
-      _CreateBundelSheetState();
+  ConsumerState<_CreateBundelSheet> createState() => _CreateBundelSheetState();
 }
 
 class _CreateBundelSheetState extends ConsumerState<_CreateBundelSheet> {
@@ -261,16 +253,13 @@ class _CreateBundelSheetState extends ConsumerState<_CreateBundelSheet> {
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      padding: EdgeInsets.fromLTRB(
-          20, 16, 20, MediaQuery.of(context).viewInsets.bottom + 20),
+      padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(context).viewInsets.bottom + 20),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Buat Bundel Baru',
-                style: GoogleFonts.poppins(
-                    fontSize: 18, fontWeight: FontWeight.w700)),
+            Text('Buat Bundel Baru', style: TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 20),
             TextField(
               controller: _titleCtrl,
@@ -304,14 +293,11 @@ class _CreateBundelSheetState extends ConsumerState<_CreateBundelSheet> {
                 onChanged: (v) => setState(() => _categoryId = v ?? ''),
               ),
             const SizedBox(height: 20),
-            Text('Pilih Berkas',
-                style: GoogleFonts.poppins(
-                    fontSize: 13, fontWeight: FontWeight.w600)),
+            Text('Pilih Berkas', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             ...allBerkas.map((berkas) => CheckboxListTile(
                   title: Text(berkas.title),
-                  subtitle:
-                      Text('${berkas.sections.length} bagian'),
+                  subtitle: Text('${berkas.sections.length} bagian'),
                   value: _selectedBerkasIds.contains(berkas.id),
                   onChanged: (v) {
                     setState(() {
@@ -324,8 +310,7 @@ class _CreateBundelSheetState extends ConsumerState<_CreateBundelSheet> {
                   },
                   contentPadding: EdgeInsets.zero,
                   dense: true,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 )),
             const SizedBox(height: 20),
             SizedBox(

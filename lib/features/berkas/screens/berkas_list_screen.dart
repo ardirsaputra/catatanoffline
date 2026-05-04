@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../shared/models/berkas_model.dart';
 import '../../../shared/models/template_model.dart';
 import '../../../shared/utils/constants.dart';
@@ -145,6 +144,7 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
               ? _buildGrid(berkas, categories, settings)
               : _buildList(berkas, categories, settings),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'fab_berkas',
         onPressed: () => _showCreateDialog(),
         icon: const Icon(Icons.add),
         label: const Text('Buat Baru'),
@@ -170,7 +170,8 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
       itemCount: berkas.length,
       itemBuilder: (context, index) {
         final item = berkas[index];
-        final cat = categories?.where((c) => c.id == item.categoryId).firstOrNull;
+        final _catWhere = categories?.where((c) => c.id == item.categoryId);
+        final cat = (_catWhere == null || _catWhere.isEmpty) ? null : _catWhere.first;
         return _BerkasGridCard(
           berkas: item,
           categoryName: cat?.name ?? 'Umum',
@@ -188,7 +189,8 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
       itemCount: berkas.length,
       itemBuilder: (context, index) {
         final item = berkas[index];
-        final cat = categories?.where((c) => c.id == item.categoryId).firstOrNull;
+        final _catWhere3 = categories?.where((c) => c.id == item.categoryId);
+        final cat = (_catWhere3 == null || _catWhere3.isEmpty) ? null : _catWhere3.first;
         return _BerkasListItem(
           berkas: item,
           categoryName: cat?.name ?? 'Umum',
@@ -318,7 +320,8 @@ class _BerkasGridCard extends StatelessWidget {
                   const SizedBox(height: 10),
                   Text(
                     berkas.title,
-                    style: GoogleFonts.poppins(
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                       color: colorScheme.onSurface,
@@ -330,7 +333,8 @@ class _BerkasGridCard extends StatelessWidget {
                     const Spacer(),
                     Text(
                       categoryName,
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
                         fontSize: 10,
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -340,7 +344,8 @@ class _BerkasGridCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       DateFormatter.formatShort(berkas.updatedAt),
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
                         fontSize: 10,
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -425,7 +430,8 @@ class _BerkasListItem extends StatelessWidget {
                   children: [
                     Text(
                       berkas.title,
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                         color: colorScheme.onSurface,
@@ -445,13 +451,14 @@ class _BerkasListItem extends StatelessWidget {
                             ),
                             child: Text(
                               categoryName,
-                              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w500),
+                              style: TextStyle(fontFamily: 'Poppins', fontSize: 11, fontWeight: FontWeight.w500),
                             ),
                           ),
                           const SizedBox(width: 8),
                           Text(
                             '${berkas.sections.length} bagian',
-                            style: GoogleFonts.poppins(
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
                               fontSize: 11,
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -459,7 +466,8 @@ class _BerkasListItem extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text(
                             DateFormatter.formatRelative(berkas.updatedAt),
-                            style: GoogleFonts.poppins(
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
                               fontSize: 11,
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -521,11 +529,8 @@ class _CreateBerkasSheetState extends ConsumerState<_CreateBerkasSheet> {
       }
       if (widget.preselectedTemplateId != null) {
         final templates = ref.read(templateProvider);
-        final tmpl = templates
-            .where(
-              (t) => t.id == widget.preselectedTemplateId,
-            )
-            .firstOrNull;
+        final _tmplWhere = templates.where((t) => t.id == widget.preselectedTemplateId);
+        final tmpl = _tmplWhere.isEmpty ? null : _tmplWhere.first;
         if (tmpl != null) {
           setState(() {
             _selectedTemplate = tmpl;
@@ -577,7 +582,7 @@ class _CreateBerkasSheetState extends ConsumerState<_CreateBerkasSheet> {
             const SizedBox(height: 20),
             Text(
               'Buat Berkas Baru',
-              style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700),
+              style: TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 20),
 
@@ -610,7 +615,7 @@ class _CreateBerkasSheetState extends ConsumerState<_CreateBerkasSheet> {
             const SizedBox(height: 16),
 
             // Icon picker
-            Text('Ikon', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600)),
+            Text('Ikon', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             SizedBox(
               height: 48,
@@ -639,7 +644,7 @@ class _CreateBerkasSheetState extends ConsumerState<_CreateBerkasSheet> {
             const SizedBox(height: 16),
 
             // Color tag
-            Text('Warna Tag', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600)),
+            Text('Warna Tag', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             SizedBox(
               height: 36,
@@ -666,7 +671,7 @@ class _CreateBerkasSheetState extends ConsumerState<_CreateBerkasSheet> {
             const SizedBox(height: 20),
 
             // Template picker
-            Text('Template', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600)),
+            Text('Template', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             SizedBox(
               height: 90,
@@ -693,7 +698,7 @@ class _CreateBerkasSheetState extends ConsumerState<_CreateBerkasSheet> {
                                 const SizedBox(height: 4),
                                 Text(
                                   tmpl.name,
-                                  style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w500),
+                                  style: TextStyle(fontFamily: 'Poppins', fontSize: 10, fontWeight: FontWeight.w500),
                                   textAlign: TextAlign.center,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,

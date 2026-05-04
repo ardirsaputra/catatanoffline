@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -149,7 +148,7 @@ class _GambarWidgetState extends State<GambarWidget> {
                     const SizedBox(height: 8),
                     Text(
                       'Ketuk untuk menambah gambar',
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(fontFamily: 'Poppins', 
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 13,
                       ),

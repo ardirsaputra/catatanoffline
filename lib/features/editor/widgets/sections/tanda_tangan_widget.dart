@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:signature/signature.dart';
 import '../../../../shared/models/section_model.dart';
 
@@ -81,7 +80,7 @@ class _TandaTanganWidgetState extends State<TandaTanganWidget> {
         TextField(
           controller: _labelCtrl,
           onChanged: (_) => _update(),
-          style: GoogleFonts.poppins(
+          style: TextStyle(fontFamily: 'Poppins', 
               fontWeight: FontWeight.w600, fontSize: 14),
           decoration: const InputDecoration(
             hintText: 'Label tanda tangan...',
@@ -198,7 +197,7 @@ class _TandaTanganWidgetState extends State<TandaTanganWidget> {
                     const SizedBox(height: 8),
                     Text(
                       'Ketuk untuk menandatangani',
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(fontFamily: 'Poppins', 
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 13,
                       ),

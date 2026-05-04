@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class EmptyStateWidget extends StatelessWidget {
   final String emoji;
@@ -30,7 +29,7 @@ class EmptyStateWidget extends StatelessWidget {
             const SizedBox(height: 24),
             Text(
               title,
-              style: GoogleFonts.poppins(
+              style: TextStyle(fontFamily: 'Poppins', 
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: colorScheme.onSurface,
@@ -40,7 +39,7 @@ class EmptyStateWidget extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               subtitle,
-              style: GoogleFonts.poppins(
+              style: TextStyle(fontFamily: 'Poppins', 
                 fontSize: 14,
                 color: colorScheme.onSurfaceVariant,
                 height: 1.5,

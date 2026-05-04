@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../shared/models/section_model.dart';
 import '../../../shared/models/template_model.dart';
 import '../providers/template_provider.dart';
@@ -71,14 +70,14 @@ class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
                       children: [
                         Text(
                           'Pilih Template',
-                          style: GoogleFonts.poppins(
+                          style: TextStyle(fontFamily: 'Poppins', 
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         Text(
                           'Pilih template sebagai titik awal berkas Anda',
-                          style: GoogleFonts.poppins(
+                          style: TextStyle(fontFamily: 'Poppins', 
                             fontSize: 12,
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -186,7 +185,7 @@ class _TemplateListTile extends StatelessWidget {
                 children: [
                   Text(
                     template.name,
-                    style: GoogleFonts.poppins(
+                    style: TextStyle(fontFamily: 'Poppins', 
                       fontSize: 12,
                       fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                       color: selected ? colorScheme.primary : null,
@@ -197,7 +196,7 @@ class _TemplateListTile extends StatelessWidget {
                   if (template.isBuiltIn)
                     Text(
                       'Bawaan',
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(fontFamily: 'Poppins', 
                         fontSize: 9,
                         color: colorScheme.secondary,
                         fontWeight: FontWeight.w600,
@@ -241,7 +240,7 @@ class _TemplatePreview extends StatelessWidget {
                   children: [
                     Text(
                       template.name,
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(fontFamily: 'Poppins', 
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -249,7 +248,7 @@ class _TemplatePreview extends StatelessWidget {
                     if (template.description.isNotEmpty)
                       Text(
                         template.description,
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(fontFamily: 'Poppins', 
                           fontSize: 12,
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -270,7 +269,7 @@ class _TemplatePreview extends StatelessWidget {
             ),
             child: Text(
               '${template.sectionsData.length} bagian',
-              style: GoogleFonts.poppins(
+              style: TextStyle(fontFamily: 'Poppins', 
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: colorScheme.primary,
@@ -282,7 +281,7 @@ class _TemplatePreview extends StatelessWidget {
           if (template.sectionsData.isEmpty)
             Text(
               'Template kosong — mulai dari awal',
-              style: GoogleFonts.poppins(
+              style: TextStyle(fontFamily: 'Poppins', 
                 fontSize: 13,
                 color: colorScheme.onSurfaceVariant,
                 fontStyle: FontStyle.italic,
@@ -291,7 +290,7 @@ class _TemplatePreview extends StatelessWidget {
           else ...[
             Text(
               'Bagian dalam template:',
-              style: GoogleFonts.poppins(
+              style: TextStyle(fontFamily: 'Poppins', 
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
@@ -319,7 +318,7 @@ class _TemplatePreview extends StatelessWidget {
                       child: Center(
                         child: Text(
                           '${idx + 1}',
-                          style: GoogleFonts.poppins(
+                          style: TextStyle(fontFamily: 'Poppins', 
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                             color: colorScheme.secondary,
@@ -333,7 +332,7 @@ class _TemplatePreview extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       sectionType.label,
-                      style: GoogleFonts.poppins(fontSize: 13),
+                      style: TextStyle(fontFamily: 'Poppins', fontSize: 13),
                     ),
                   ],
                 ),
@@ -368,7 +367,7 @@ class _EmptyPreview extends StatelessWidget {
           Text(
             'Pilih template\nuntuk melihat pratinjau',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: TextStyle(fontFamily: 'Poppins', 
               color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 13,
               height: 1.6,

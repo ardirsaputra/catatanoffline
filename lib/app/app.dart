@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/translations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/theme/app_theme.dart';
 import '../app/theme/color_schemes.dart';
@@ -23,6 +25,16 @@ class BerkasKuApp extends ConsumerWidget {
     return MaterialApp(
       title: 'BerkasKu',
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        FlutterQuillLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('id'),
+      ],
       theme: theme,
       darkTheme: AppTheme.build(
         scheme: AppColorSchemes.fromString(settings.themePreset),

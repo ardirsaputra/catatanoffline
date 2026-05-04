@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../../shared/models/section_model.dart';
 
 class WawancaraWidget extends StatefulWidget {
@@ -57,7 +56,7 @@ class _WawancaraWidgetState extends State<WawancaraWidget> {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text('P',
-                  style: GoogleFonts.poppins(
+                  style: TextStyle(fontFamily: 'Poppins', 
                       fontWeight: FontWeight.w700,
                       color: colorScheme.primary,
                       fontSize: 13)),
@@ -67,7 +66,7 @@ class _WawancaraWidgetState extends State<WawancaraWidget> {
               child: TextField(
                 controller: _questionCtrl,
                 onChanged: (_) => _update(),
-                style: GoogleFonts.poppins(
+                style: TextStyle(fontFamily: 'Poppins', 
                     fontWeight: FontWeight.w600, fontSize: 14),
                 decoration: InputDecoration(
                   hintText: 'Tulis pertanyaan...',
@@ -96,7 +95,7 @@ class _WawancaraWidgetState extends State<WawancaraWidget> {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text('J',
-                  style: GoogleFonts.poppins(
+                  style: TextStyle(fontFamily: 'Poppins', 
                       fontWeight: FontWeight.w700,
                       color: colorScheme.onSurface,
                       fontSize: 13)),
@@ -106,7 +105,7 @@ class _WawancaraWidgetState extends State<WawancaraWidget> {
               child: TextField(
                 controller: _answerCtrl,
                 onChanged: (_) => _update(),
-                style: GoogleFonts.poppins(fontSize: 14, height: 1.6),
+                style: TextStyle(fontFamily: 'Poppins', fontSize: 14, height: 1.6),
                 decoration: InputDecoration(
                   hintText: 'Tulis jawaban...',
                   border: InputBorder.none,

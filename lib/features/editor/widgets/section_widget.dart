@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../shared/models/section_model.dart';
 import 'sections/wawancara_widget.dart';
 import 'sections/checklist_widget.dart';
@@ -46,7 +45,7 @@ class SectionWidget extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   section.type.label,
-                  style: GoogleFonts.poppins(
+                  style: TextStyle(fontFamily: 'Poppins', 
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onPrimaryContainer,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../shared/models/section_model.dart';
 
 class AddSectionSheet extends StatelessWidget {
@@ -32,7 +31,7 @@ class AddSectionSheet extends StatelessWidget {
               children: [
                 Text(
                   'Tambah Bagian',
-                  style: GoogleFonts.poppins(
+                  style: TextStyle(fontFamily: 'Poppins', 
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: colorScheme.onSurface,
@@ -104,7 +103,7 @@ class _SectionTypeCard extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: GoogleFonts.poppins(
+                    style: TextStyle(fontFamily: 'Poppins', 
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: colorScheme.onSurface,
@@ -112,7 +111,7 @@ class _SectionTypeCard extends StatelessWidget {
                   ),
                   Text(
                     subtitle,
-                    style: GoogleFonts.poppins(
+                    style: TextStyle(fontFamily: 'Poppins', 
                       fontSize: 10,
                       color: colorScheme.onSurfaceVariant,
                     ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../../shared/models/section_model.dart';
 
 class EsaiWidget extends StatefulWidget {
@@ -56,7 +55,7 @@ class _EsaiWidgetState extends State<EsaiWidget> {
           child: TextField(
             controller: _questionCtrl,
             onChanged: (_) => _update(),
-            style: GoogleFonts.poppins(
+            style: TextStyle(fontFamily: 'Poppins', 
                 fontWeight: FontWeight.w600, fontSize: 14),
             decoration: const InputDecoration(
               hintText: 'Tulis pertanyaan esai...',
@@ -81,7 +80,7 @@ class _EsaiWidgetState extends State<EsaiWidget> {
           child: TextField(
             controller: _answerCtrl,
             onChanged: (_) => _update(),
-            style: GoogleFonts.poppins(fontSize: 14, height: 1.7),
+            style: TextStyle(fontFamily: 'Poppins', fontSize: 14, height: 1.7),
             decoration: const InputDecoration(
               hintText: 'Tulis jawaban esai di sini...',
               border: InputBorder.none,
@@ -99,7 +98,7 @@ class _EsaiWidgetState extends State<EsaiWidget> {
             padding: const EdgeInsets.only(top: 4),
             child: Text(
               '${_answerCtrl.text.length} karakter',
-              style: GoogleFonts.poppins(
+              style: TextStyle(fontFamily: 'Poppins', 
                 fontSize: 11,
                 color: colorScheme.onSurfaceVariant,
               ),

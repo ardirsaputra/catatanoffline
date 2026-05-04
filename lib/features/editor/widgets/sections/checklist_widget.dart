@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../../shared/models/section_model.dart';
 import 'package:uuid/uuid.dart';
 
@@ -86,7 +85,7 @@ class _ChecklistWidgetState extends State<ChecklistWidget> {
               child: TextField(
                 controller: _titleCtrl,
                 onChanged: (_) => _update(),
-                style: GoogleFonts.poppins(
+                style: TextStyle(fontFamily: 'Poppins', 
                     fontWeight: FontWeight.w600, fontSize: 15),
                 decoration: const InputDecoration(
                   border: InputBorder.none,
@@ -106,7 +105,7 @@ class _ChecklistWidgetState extends State<ChecklistWidget> {
               ),
               child: Text(
                 '$_checkedCount/${_items.length} selesai',
-                style: GoogleFonts.poppins(
+                style: TextStyle(fontFamily: 'Poppins', 
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: colorScheme.onSurface,
@@ -138,7 +137,7 @@ class _ChecklistWidgetState extends State<ChecklistWidget> {
                       _items[idx]['text'] = v;
                       _update();
                     },
-                    style: GoogleFonts.poppins(
+                    style: TextStyle(fontFamily: 'Poppins', 
                       fontSize: 14,
                       decoration: item['checked'] == true
                           ? TextDecoration.lineThrough

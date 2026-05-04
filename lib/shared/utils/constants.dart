@@ -16,21 +16,47 @@ class AppConstants {
     {'name': 'Umum', 'icon': '📄', 'color': '#A8D8EA'},
     {'name': 'Interview Klien', 'icon': '💬', 'color': '#FFDFD3'},
     {'name': 'Audit', 'icon': '🔍', 'color': '#B5EAD7'},
-    {'name': 'Kuesioner Kesehatan', 'icon': '🏥', 'color': '#FFB5C8'},
     {'name': 'Survei', 'icon': '📊', 'color': '#C9B8E8'},
   ];
 
   // Card icon options
   static const List<String> cardIcons = [
-    '📄', '📋', '📝', '🗒️', '📊', '📈', '📉',
-    '💼', '🗂️', '📁', '📂', '🔍', '✅', '☑️',
-    '💬', '🏥', '🔬', '⚙️', '🎯', '📌', '🔖',
+    '📄',
+    '📋',
+    '📝',
+    '🗒️',
+    '📊',
+    '📈',
+    '📉',
+    '💼',
+    '🗂️',
+    '📁',
+    '📂',
+    '🔍',
+    '✅',
+    '☑️',
+    '💬',
+    '🏥',
+    '🔬',
+    '⚙️',
+    '🎯',
+    '📌',
+    '🔖',
   ];
 
   // Color tag options
   static const List<String> colorTags = [
-    '#A8D8EA', '#FFDFD3', '#B5EAD7', '#FFB5C8',
-    '#C9B8E8', '#FFE5A0', '#B8D4E8', '#F5E6CC',
-    '#D4F5E9', '#FFD4E0', '#E8D5F5', '#CCE8FF',
+    '#A8D8EA',
+    '#FFDFD3',
+    '#B5EAD7',
+    '#FFB5C8',
+    '#C9B8E8',
+    '#FFE5A0',
+    '#B8D4E8',
+    '#F5E6CC',
+    '#D4F5E9',
+    '#FFD4E0',
+    '#E8D5F5',
+    '#CCE8FF',
   ];
 }

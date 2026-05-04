@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../../shared/models/section_model.dart';
 import 'package:uuid/uuid.dart';
 
@@ -224,7 +223,7 @@ class _TabelWidgetState extends State<TabelWidget> {
                   _headers[colIdx] = v;
                   _update();
                 },
-                style: GoogleFonts.poppins(
+                style: TextStyle(fontFamily: 'Poppins', 
                     fontSize: 12, fontWeight: FontWeight.w700),
                 textAlign: TextAlign.center,
                 decoration: const InputDecoration(
@@ -270,7 +269,7 @@ class _TabelWidgetState extends State<TabelWidget> {
             _rows[rowIdx][colIdx] = v;
             _update();
           },
-          style: GoogleFonts.poppins(fontSize: 12),
+          style: TextStyle(fontFamily: 'Poppins', fontSize: 12),
           textAlign: TextAlign.center,
           decoration: const InputDecoration(
             border: InputBorder.none,
