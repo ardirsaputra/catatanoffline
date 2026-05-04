@@ -27,14 +27,12 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   void initState() {
     super.initState();
     final berkas = ref.read(editorProvider).berkas;
-    _titleController =
-        TextEditingController(text: berkas?.title ?? 'Berkas Baru');
+    _titleController = TextEditingController(text: berkas?.title ?? 'Berkas Baru');
     _startAutoSave();
   }
 
   void _startAutoSave() {
-    final interval =
-        ref.read(settingsProvider).autoSaveInterval;
+    final interval = ref.read(settingsProvider).autoSaveInterval;
     _autoSaveTimer = Timer.periodic(
       Duration(seconds: interval),
       (_) => ref.read(editorProvider.notifier).save(),
@@ -60,6 +58,19 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xFF6C63FF),
+        foregroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actionsIconTheme: const IconThemeData(color: Colors.white),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF6C63FF), Color(0xFF957FEF)],
+            ),
+          ),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () async {
@@ -73,8 +84,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             ? TextField(
                 controller: _titleController,
                 autofocus: true,
-                style: TextStyle(fontFamily: 'Poppins', 
-                    fontWeight: FontWeight.w600, fontSize: 16),
+                style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 16, color: Colors.white),
+                cursorColor: Colors.white,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.zero,
@@ -85,16 +96,26 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   setState(() => _titleEditing = false);
                 },
                 onTapOutside: (_) {
-                  ref.read(editorProvider.notifier)
-                      .updateTitle(_titleController.text);
+                  ref.read(editorProvider.notifier).updateTitle(_titleController.text);
                   setState(() => _titleEditing = false);
                 },
               )
             : GestureDetector(
                 onTap: () => setState(() => _titleEditing = true),
-                child: Text(
-                  berkas.title,
-                  style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      berkas.title,
+                      style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 15, color: Colors.white),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      '${berkas.sections.length} bagian',
+                      style: TextStyle(fontFamily: 'Poppins', fontSize: 11, color: Colors.white.withOpacity(0.80)),
+                    ),
+                  ],
                 ),
               ),
         actions: [
@@ -116,15 +137,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                   )
                 : Icon(
-                    editorState.isDirty
-                        ? Icons.save_outlined
-                        : Icons.check_circle_outline,
-                    color: editorState.isDirty
-                        ? colorScheme.primary
-                        : Colors.green,
+                    editorState.isDirty ? Icons.save_outlined : Icons.check_circle_outline,
+                    color: editorState.isDirty ? Colors.white : Colors.greenAccent,
                   ),
             tooltip: 'Simpan',
             onPressed: () => ref.read(editorProvider.notifier).save(),
@@ -133,11 +150,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           PopupMenuButton<String>(
             onSelected: (v) => _handleMenuAction(v, berkas),
             itemBuilder: (_) => const [
-              PopupMenuItem(
-                  value: 'export', child: Text('Export ke Word (.docx)')),
-              PopupMenuItem(
-                  value: 'template',
-                  child: Text('Simpan sebagai Template')),
+              PopupMenuItem(value: 'export', child: Text('Export ke Word (.docx)')),
+              PopupMenuItem(value: 'template', child: Text('Simpan sebagai Template')),
             ],
           ),
         ],
@@ -159,23 +173,19 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               ? _EmptyEditor(onAddSection: _showAddSection)
               : ReorderableListView.builder(
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 100),
+                  buildDefaultDragHandles: false,
                   itemCount: berkas.sections.length,
                   onReorder: (oldIndex, newIndex) {
-                    ref
-                        .read(editorProvider.notifier)
-                        .reorderSections(oldIndex, newIndex);
+                    ref.read(editorProvider.notifier).reorderSections(oldIndex, newIndex);
                   },
                   itemBuilder: (context, index) {
                     final section = berkas.sections[index];
                     return SectionWidget(
                       key: ValueKey(section.id),
                       section: section,
-                      onChanged: (updated) => ref
-                          .read(editorProvider.notifier)
-                          .updateSection(updated),
-                      onDelete: () => ref
-                          .read(editorProvider.notifier)
-                          .removeSection(section.id),
+                      index: index,
+                      onChanged: (updated) => ref.read(editorProvider.notifier).updateSection(updated),
+                      onDelete: () => ref.read(editorProvider.notifier).removeSection(section.id),
                     );
                   },
                 ),
@@ -261,8 +271,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   }
 
   Future<void> _saveAsTemplate(BerkasModel berkas) async {
-    final nameController =
-        TextEditingController(text: '${berkas.title} (Template)');
+    final nameController = TextEditingController(text: '${berkas.title} (Template)');
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -272,12 +281,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           decoration: const InputDecoration(labelText: 'Nama Template'),
         ),
         actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Batal')),
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Simpan')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Simpan')),
         ],
       ),
     );
@@ -305,7 +310,8 @@ class _EmptyEditor extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'Belum Ada Bagian',
-            style: TextStyle(fontFamily: 'Poppins', 
+            style: TextStyle(
+              fontFamily: 'Poppins',
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: colorScheme.onSurface,
@@ -315,7 +321,8 @@ class _EmptyEditor extends StatelessWidget {
           Text(
             'Tekan tombol + untuk menambahkan\nbagian pertama ke berkas ini.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontFamily: 'Poppins', 
+            style: TextStyle(
+              fontFamily: 'Poppins',
               color: colorScheme.onSurfaceVariant,
               height: 1.6,
             ),
@@ -354,9 +361,7 @@ class _ExportOptionsDialogState extends State<_ExportOptionsDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Orientasi Halaman',
-                style: TextStyle(fontFamily: 'Poppins', 
-                    fontWeight: FontWeight.w600, fontSize: 13)),
+            Text('Orientasi Halaman', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 13)),
             RadioListTile(
               title: const Text('Portrait'),
               value: 'portrait',
@@ -389,9 +394,7 @@ class _ExportOptionsDialogState extends State<_ExportOptionsDialog> {
               dense: true,
             ),
             const Divider(),
-            Text('Font',
-                style: TextStyle(fontFamily: 'Poppins', 
-                    fontWeight: FontWeight.w600, fontSize: 13)),
+            Text('Font', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 13)),
             RadioListTile(
               title: const Text('Times New Roman'),
               value: 'Times New Roman',

@@ -239,16 +239,16 @@ class BerandaScreen extends ConsumerWidget {
       expandedHeight: 190,
       floating: false,
       pinned: true,
-      flexibleSpace: FlexibleSpaceBar(
-        title: const Text(
-          'BerkasKu',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
-            color: Colors.white,
-          ),
+      title: const Text(
+        'BerkasKu offline',
+        style: TextStyle(
+          fontFamily: 'Poppins',
+          fontWeight: FontWeight.w700,
+          fontSize: 20,
+          color: Colors.white,
         ),
+      ),
+      flexibleSpace: FlexibleSpaceBar(
         background: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(

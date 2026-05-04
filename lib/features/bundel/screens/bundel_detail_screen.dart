@@ -14,24 +14,46 @@ class BundelDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentBundle = ref
-        .watch(bundelProvider)
-        .firstWhere((b) => b.id == bundle.id, orElse: () => bundle);
+    final currentBundle = ref.watch(bundelProvider).firstWhere((b) => b.id == bundle.id, orElse: () => bundle);
     final allBerkas = ref.watch(berkasProvider);
-    final berkasInBundle = allBerkas
-        .where((b) => currentBundle.berkasIds.contains(b.id))
-        .toList();
+    final berkasInBundle = allBerkas.where((b) => currentBundle.berkasIds.contains(b.id)).toList();
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(currentBundle.title),
+        backgroundColor: const Color(0xFF43C59E),
+        foregroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actionsIconTheme: const IconThemeData(color: Colors.white),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF43C59E), Color(0xFF2CB5A0)],
+            ),
+          ),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              currentBundle.title,
+              style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 15, color: Colors.white),
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              '${berkasInBundle.length} berkas',
+              style: TextStyle(fontFamily: 'Poppins', fontSize: 11, color: Colors.white.withOpacity(0.80)),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: 'Tambah Berkas',
-            onPressed: () =>
-                _showAddBerkasDialog(context, ref, currentBundle, allBerkas),
+            onPressed: () => _showAddBerkasDialog(context, ref, currentBundle, allBerkas),
           ),
           PopupMenuButton<String>(
             onSelected: (v) async {
@@ -55,67 +77,44 @@ class BundelDetailScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // Bundle info
-          Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: colorScheme.primaryContainer.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(16),
+          // Bundle description strip (if any)
+          if (currentBundle.description.isNotEmpty)
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                currentBundle.description,
+                style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: colorScheme.onSurfaceVariant),
+              ),
             ),
-            child: Row(
-              children: [
-                const Text('📦', style: TextStyle(fontSize: 32)),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        currentBundle.title,
-                        style: TextStyle(fontFamily: 'Poppins', 
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
-                      ),
-                      if (currentBundle.description.isNotEmpty)
-                        Text(
-                          currentBundle.description,
-                          style: TextStyle(fontFamily: 'Poppins', 
-                            fontSize: 13,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      Text(
-                        '${berkasInBundle.length} berkas · ${DateFormatter.formatRelative(currentBundle.updatedAt)}',
-                        style: TextStyle(fontFamily: 'Poppins', 
-                          fontSize: 12,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
 
           // Berkas list header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: Row(
               children: [
                 Text(
                   'Berkas dalam Bundel',
-                  style: TextStyle(fontFamily: 'Poppins', 
-                    fontWeight: FontWeight.w600,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w700,
                     fontSize: 14,
+                    color: colorScheme.primary,
                   ),
+                ),
+                const Spacer(),
+                Text(
+                  DateFormatter.formatRelative(currentBundle.updatedAt),
+                  style: TextStyle(fontFamily: 'Poppins', fontSize: 11, color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 8),
 
           // Berkas list
           Expanded(
@@ -124,33 +123,25 @@ class BundelDetailScreen extends ConsumerWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('📄',
-                            style: TextStyle(fontSize: 40)),
+                        const Text('📄', style: TextStyle(fontSize: 40)),
                         const SizedBox(height: 12),
                         Text(
                           'Bundel ini kosong\nTambahkan berkas ke dalam bundel',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontFamily: 'Poppins', 
-                            color: colorScheme.onSurfaceVariant,
-                            height: 1.6,
-                          ),
+                          style: TextStyle(fontFamily: 'Poppins', color: colorScheme.onSurfaceVariant, height: 1.6),
                         ),
                       ],
                     ),
                   )
                 : ReorderableListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     itemCount: berkasInBundle.length,
                     onReorder: (oldIndex, newIndex) async {
-                      final ids =
-                          List<String>.from(currentBundle.berkasIds);
+                      final ids = List<String>.from(currentBundle.berkasIds);
                       if (newIndex > oldIndex) newIndex--;
                       final item = ids.removeAt(oldIndex);
                       ids.insert(newIndex, item);
-                      await ref
-                          .read(bundelProvider.notifier)
-                          .update(currentBundle.copyWith(berkasIds: ids));
+                      await ref.read(bundelProvider.notifier).update(currentBundle.copyWith(berkasIds: ids));
                     },
                     itemBuilder: (context, index) {
                       final berkas = berkasInBundle[index];
@@ -158,10 +149,7 @@ class BundelDetailScreen extends ConsumerWidget {
                         key: ValueKey(berkas.id),
                         berkas: berkas,
                         index: index + 1,
-                        onRemove: () => ref
-                            .read(bundelProvider.notifier)
-                            .removeBerkasFromBundle(
-                                currentBundle.id, berkas.id),
+                        onRemove: () => ref.read(bundelProvider.notifier).removeBerkasFromBundle(currentBundle.id, berkas.id),
                       );
                     },
                   ),
@@ -173,8 +161,7 @@ class BundelDetailScreen extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: ElevatedButton.icon(
-                  onPressed: () =>
-                      _exportBundle(context, currentBundle, berkasInBundle),
+                  onPressed: () => _exportBundle(context, currentBundle, berkasInBundle),
                   icon: const Icon(Icons.description_outlined),
                   label: const Text('Export Bundel ke Word'),
                 ),
@@ -190,8 +177,7 @@ class BundelDetailScreen extends ConsumerWidget {
     BundelModel bundle,
     List<BerkasModel> allBerkas,
   ) {
-    final notInBundle =
-        allBerkas.where((b) => !bundle.berkasIds.contains(b.id)).toList();
+    final notInBundle = allBerkas.where((b) => !bundle.berkasIds.contains(b.id)).toList();
     if (notInBundle.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Semua berkas sudah ada dalam bundel')),
@@ -206,8 +192,7 @@ class BundelDetailScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             child: Text(
               'Tambah Berkas ke Bundel',
-              style: TextStyle(fontFamily: 'Poppins', 
-                  fontSize: 16, fontWeight: FontWeight.w700),
+              style: TextStyle(fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w700),
             ),
           ),
           Expanded(
@@ -216,14 +201,11 @@ class BundelDetailScreen extends ConsumerWidget {
               itemBuilder: (ctx, index) {
                 final berkas = notInBundle[index];
                 return ListTile(
-                  leading: Text(berkas.iconName,
-                      style: const TextStyle(fontSize: 24)),
+                  leading: Text(berkas.iconName, style: const TextStyle(fontSize: 24)),
                   title: Text(berkas.title),
                   subtitle: Text('${berkas.sections.length} bagian'),
                   onTap: () {
-                    ref
-                        .read(bundelProvider.notifier)
-                        .addBerkasToBundle(bundle.id, berkas.id);
+                    ref.read(bundelProvider.notifier).addBerkasToBundle(bundle.id, berkas.id);
                     Navigator.pop(ctx);
                   },
                 );
@@ -261,8 +243,7 @@ class BundelDetailScreen extends ConsumerWidget {
     } catch (e) {
       if (context.mounted) {
         messenger.hideCurrentSnackBar();
-        messenger
-            .showSnackBar(SnackBar(content: Text('Gagal ekspor: $e')));
+        messenger.showSnackBar(SnackBar(content: Text('Gagal ekspor: $e')));
       }
     }
   }
@@ -291,28 +272,25 @@ class _BerkasInBundelItem extends StatelessWidget {
           children: [
             Text(
               '$index',
-              style: TextStyle(fontFamily: 'Poppins', 
+              style: TextStyle(
+                fontFamily: 'Poppins',
                 fontWeight: FontWeight.w700,
                 color: colorScheme.primary,
                 fontSize: 14,
               ),
             ),
             const SizedBox(width: 8),
-            Text(berkas.iconName,
-                style: const TextStyle(fontSize: 22)),
+            Text(berkas.iconName, style: const TextStyle(fontSize: 22)),
           ],
         ),
-        title: Text(berkas.title,
-            style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
+        title: Text(berkas.title, style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600)),
         subtitle: Text('${berkas.sections.length} bagian'),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.drag_handle,
-                color: colorScheme.onSurfaceVariant),
+            Icon(Icons.drag_handle, color: colorScheme.onSurfaceVariant),
             IconButton(
-              icon: Icon(Icons.remove_circle_outline,
-                  color: colorScheme.error),
+              icon: Icon(Icons.remove_circle_outline, color: colorScheme.error),
               onPressed: onRemove,
             ),
           ],

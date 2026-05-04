@@ -48,6 +48,7 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
   @override
   Widget build(BuildContext context) {
     final berkas = ref.watch(filteredBerkasProvider);
+    final allBerkasCount = ref.watch(berkasProvider).length;
     final categories = ref.watch(categoryProvider);
     final selectedCat = ref.watch(berkasSelectedCategoryProvider);
     final settings = ref.watch(settingsProvider);
@@ -55,94 +56,127 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
     final isGrid = settings.defaultView == 'grid';
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Berkas'),
-        actions: [
-          IconButton(
-            icon: Icon(isGrid ? Icons.view_list : Icons.grid_view),
-            tooltip: isGrid ? 'Tampilan Daftar' : 'Tampilan Grid',
-            onPressed: () => ref.read(settingsProvider.notifier).setDefaultView(isGrid ? 'list' : 'grid'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.sort),
-            tooltip: 'Urutkan',
-            onPressed: () {},
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(112),
-          child: Column(
-            children: [
-              // Search bar
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (v) => ref.read(berkasSearchQueryProvider.notifier).state = v,
-                  decoration: InputDecoration(
-                    hintText: 'Cari berkas...',
-                    prefixIcon: const Icon(Icons.search, size: 20),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear, size: 20),
-                            onPressed: () {
-                              _searchController.clear();
-                              ref.read(berkasSearchQueryProvider.notifier).state = '';
-                            },
-                          )
-                        : null,
-                    filled: true,
-                    fillColor: colorScheme.surface,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
+      body: NestedScrollView(
+        headerSliverBuilder: (ctx, innerScrolled) => [
+          SliverAppBar(
+            expandedHeight: 130,
+            floating: false,
+            pinned: true,
+            forceElevated: innerScrolled,
+            backgroundColor: const Color(0xFF6C63FF),
+            foregroundColor: Colors.white,
+            iconTheme: const IconThemeData(color: Colors.white),
+            actionsIconTheme: const IconThemeData(color: Colors.white),
+            title: const Text(
+              'Berkas',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w700,
+                fontSize: 20,
+                color: Colors.white,
+              ),
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(isGrid ? Icons.view_list : Icons.grid_view),
+                tooltip: isGrid ? 'Tampilan Daftar' : 'Tampilan Grid',
+                onPressed: () => ref.read(settingsProvider.notifier).setDefaultView(isGrid ? 'list' : 'grid'),
+              ),
+              IconButton(
+                icon: const Icon(Icons.sort),
+                tooltip: 'Urutkan',
+                onPressed: () {},
+              ),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF6C63FF), Color(0xFF957FEF), Color(0xFFB09FFF)],
+                    stops: [0.0, 0.5, 1.0],
                   ),
                 ),
-              ),
-              // Category filter chips
-              SizedBox(
-                height: 44,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Stack(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        label: const Text('Semua'),
-                        selected: selectedCat == null,
-                        onSelected: (_) => ref.read(berkasSelectedCategoryProvider.notifier).state = null,
+                    Positioned(
+                      top: -30,
+                      right: -20,
+                      child: Container(
+                        width: 130,
+                        height: 130,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.10),
+                        ),
                       ),
                     ),
-                    ...categories.map((cat) => Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: FilterChip(
-                            label: Text('${cat.iconName} ${cat.name}'),
-                            selected: selectedCat == cat.id,
-                            onSelected: (_) => ref.read(berkasSelectedCategoryProvider.notifier).state = selectedCat == cat.id ? null : cat.id,
+                    Positioned(
+                      bottom: 16,
+                      left: 16,
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.07),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 76, 20, 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.20),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '$allBerkasCount berkas tersimpan',
+                              style: const TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
-                        )),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
-            ],
+            ),
           ),
-        ),
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _SearchFilterDelegate(
+              searchController: _searchController,
+              categories: categories,
+              selectedCat: selectedCat,
+              ref: ref,
+              colorScheme: colorScheme,
+            ),
+          ),
+        ],
+        body: berkas.isEmpty
+            ? EmptyStateWidget(
+                emoji: '📂',
+                title: 'Belum Ada Berkas',
+                subtitle: 'Tekan tombol + untuk membuat berkas baru.\nAnda bisa memilih template atau mulai dari awal.',
+                actionLabel: 'Buat Berkas Pertama',
+                onAction: () => _showCreateDialog(),
+              )
+            : isGrid
+                ? _buildGrid(berkas, categories, settings)
+                : _buildList(berkas, categories, settings),
       ),
-      body: berkas.isEmpty
-          ? EmptyStateWidget(
-              emoji: '📂',
-              title: 'Belum Ada Berkas',
-              subtitle: 'Tekan tombol + untuk membuat berkas baru.\nAnda bisa memilih template atau mulai dari awal.',
-              actionLabel: 'Buat Berkas Pertama',
-              onAction: () => _showCreateDialog(),
-            )
-          : isGrid
-              ? _buildGrid(berkas, categories, settings)
-              : _buildList(berkas, categories, settings),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'fab_berkas',
         onPressed: () => _showCreateDialog(),
@@ -255,6 +289,104 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
         );
       }
     }
+  }
+}
+
+// ── Search + Filter Pinned Header ─────────────────────────────────────────────
+
+class _SearchFilterDelegate extends SliverPersistentHeaderDelegate {
+  final TextEditingController searchController;
+  final List categories;
+  final String? selectedCat;
+  final WidgetRef ref;
+  final ColorScheme colorScheme;
+
+  const _SearchFilterDelegate({
+    required this.searchController,
+    required this.categories,
+    required this.selectedCat,
+    required this.ref,
+    required this.colorScheme,
+  });
+
+  @override
+  double get maxExtent => 100;
+  @override
+  double get minExtent => 100;
+  @override
+  bool shouldRebuild(_SearchFilterDelegate old) => old.selectedCat != selectedCat || old.categories.length != categories.length;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return SizedBox(
+      height: 100,
+      child: Material(
+        color: colorScheme.surface,
+        elevation: overlapsContent ? 2 : 0,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+              child: TextField(
+                controller: searchController,
+                onChanged: (v) => ref.read(berkasSearchQueryProvider.notifier).state = v,
+                decoration: InputDecoration(
+                  hintText: 'Cari berkas...',
+                  hintStyle: const TextStyle(fontFamily: 'Poppins', fontSize: 13),
+                  prefixIcon: const Icon(Icons.search, size: 18),
+                  suffixIcon: searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, size: 18),
+                          onPressed: () {
+                            searchController.clear();
+                            ref.read(berkasSearchQueryProvider.notifier).state = '';
+                          },
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  isDense: true,
+                ),
+              ),
+            ),
+          SizedBox(
+            height: 40,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: FilterChip(
+                    label: const Text('Semua', style: TextStyle(fontFamily: 'Poppins', fontSize: 11)),
+                    selected: selectedCat == null,
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    onSelected: (_) => ref.read(berkasSelectedCategoryProvider.notifier).state = null,
+                  ),
+                ),
+                ...categories.map((cat) => Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: FilterChip(
+                        label: Text('${cat.iconName} ${cat.name}', style: const TextStyle(fontFamily: 'Poppins', fontSize: 11)),
+                        selected: selectedCat == cat.id,
+                        visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        onSelected: (_) => ref.read(berkasSelectedCategoryProvider.notifier).state = selectedCat == cat.id ? null : cat.id,
+                      ),
+                    )),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ));
   }
 }
 

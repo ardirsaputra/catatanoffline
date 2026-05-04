@@ -17,40 +17,131 @@ class BundelScreen extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bundel Kuesioner'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () => _showInfo(context),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 130,
+            floating: false,
+            pinned: true,
+            backgroundColor: const Color(0xFF43C59E),
+            foregroundColor: Colors.white,
+            iconTheme: const IconThemeData(color: Colors.white),
+            actionsIconTheme: const IconThemeData(color: Colors.white),
+            title: const Text(
+              'Bundel Kuesioner',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w700,
+                fontSize: 20,
+                color: Colors.white,
+              ),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.info_outline),
+                onPressed: () => _showInfo(context),
+              ),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF43C59E), Color(0xFF2CB5A0), Color(0xFF1A9B8A)],
+                    stops: [0.0, 0.5, 1.0],
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: -30,
+                      right: -20,
+                      child: Container(
+                        width: 130,
+                        height: 130,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.10),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 16,
+                      left: 16,
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.07),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 76, 20, 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.20),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '${bundles.length} bundel tersimpan',
+                              style: const TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
+          if (bundles.isEmpty)
+            SliverFillRemaining(
+              child: EmptyStateWidget(
+                emoji: '📦',
+                title: 'Belum Ada Bundel',
+                subtitle: 'Bundel memungkinkan Anda menggabungkan\nbeberapa berkas menjadi satu dokumen.',
+                actionLabel: 'Buat Bundel',
+                onAction: () => _showCreateDialog(context, ref),
+              ),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 100),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final bundle = bundles[index];
+                    return _BundelCard(
+                      bundle: bundle,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => BundelDetailScreen(bundle: bundle),
+                        ),
+                      ),
+                      onDelete: () => _confirmDelete(context, ref, bundle),
+                    );
+                  },
+                  childCount: bundles.length,
+                ),
+              ),
+            ),
         ],
       ),
-      body: bundles.isEmpty
-          ? EmptyStateWidget(
-              emoji: '📦',
-              title: 'Belum Ada Bundel',
-              subtitle: 'Bundel memungkinkan Anda menggabungkan\nbeberapa berkas menjadi satu dokumen.',
-              actionLabel: 'Buat Bundel',
-              onAction: () => _showCreateDialog(context, ref),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: bundles.length,
-              itemBuilder: (context, index) {
-                final bundle = bundles[index];
-                return _BundelCard(
-                  bundle: bundle,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BundelDetailScreen(bundle: bundle),
-                    ),
-                  ),
-                  onDelete: () => _confirmDelete(context, ref, bundle),
-                );
-              },
-            ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'fab_bundel',
         onPressed: () => _showCreateDialog(context, ref),
@@ -134,26 +225,26 @@ class _BundelCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 8),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Row(
             children: [
               Container(
-                width: 52,
-                height: 52,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
-                  color: colorScheme.tertiary.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(14),
+                  color: colorScheme.tertiary.withOpacity(0.18),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Center(
-                  child: Text('📦', style: TextStyle(fontSize: 26)),
+                  child: Text('📦', style: TextStyle(fontSize: 22)),
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
