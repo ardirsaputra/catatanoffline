@@ -16,6 +16,7 @@ class HiveService {
     await Hive.openBox<String>(AppConstants.boxBundles);
     await Hive.openBox<String>(AppConstants.boxSettings);
     await Hive.openBox<String>(AppConstants.boxTemplates);
+    await Hive.openBox<String>(AppConstants.boxAuth);
     await _seedDefaultCategories();
   }
 
@@ -37,29 +38,36 @@ class HiveService {
 
   // ── Berkas ────────────────────────────────────────────────────────────────
   static Box<String> get berkasBox => Hive.box<String>(AppConstants.boxBerkas);
-  static Box<String> get categoriesBox =>
-      Hive.box<String>(AppConstants.boxCategories);
-  static Box<String> get bundlesBox =>
-      Hive.box<String>(AppConstants.boxBundles);
-  static Box<String> get settingsBox =>
-      Hive.box<String>(AppConstants.boxSettings);
-  static Box<String> get templatesBox =>
-      Hive.box<String>(AppConstants.boxTemplates);
+  static Box<String> get categoriesBox => Hive.box<String>(AppConstants.boxCategories);
+  static Box<String> get bundlesBox => Hive.box<String>(AppConstants.boxBundles);
+  static Box<String> get settingsBox => Hive.box<String>(AppConstants.boxSettings);
+  static Box<String> get templatesBox => Hive.box<String>(AppConstants.boxTemplates);
+  static Box<String> get authBox => Hive.box<String>(AppConstants.boxAuth);
+
+  // Auth state
+  static Map<String, dynamic> getAuthState() {
+    final json = authBox.get(AppConstants.authKey);
+    if (json == null) return {'failedAttempts': 0, 'lockedUntil': null};
+    return Map<String, dynamic>.from(jsonDecode(json));
+  }
+
+  static Future<void> saveAuthState(Map<String, dynamic> state) async {
+    await authBox.put(AppConstants.authKey, jsonEncode(state));
+  }
+
+  static Future<void> resetAuthState() async {
+    await authBox.put(AppConstants.authKey, jsonEncode({'failedAttempts': 0, 'lockedUntil': null}));
+  }
 
   // Berkas CRUD
   static List<BerkasModel> getAllBerkas() {
-    return berkasBox.values
-        .map((json) =>
-            BerkasModel.fromMap(Map<String, dynamic>.from(jsonDecode(json))))
-        .toList()
-      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    return berkasBox.values.map((json) => BerkasModel.fromMap(Map<String, dynamic>.from(jsonDecode(json)))).toList()..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
   }
 
   static BerkasModel? getBerkasById(String id) {
     final json = berkasBox.get(id);
     if (json == null) return null;
-    return BerkasModel.fromMap(
-        Map<String, dynamic>.from(jsonDecode(json)));
+    return BerkasModel.fromMap(Map<String, dynamic>.from(jsonDecode(json)));
   }
 
   static Future<void> saveBerkas(BerkasModel berkas) async {
@@ -72,11 +80,7 @@ class HiveService {
 
   // Category CRUD
   static List<CategoryModel> getAllCategories() {
-    return categoriesBox.values
-        .map((json) =>
-            CategoryModel.fromMap(Map<String, dynamic>.from(jsonDecode(json))))
-        .toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+    return categoriesBox.values.map((json) => CategoryModel.fromMap(Map<String, dynamic>.from(jsonDecode(json)))).toList()..sort((a, b) => a.name.compareTo(b.name));
   }
 
   static Future<void> saveCategory(CategoryModel category) async {
@@ -89,11 +93,7 @@ class HiveService {
 
   // Bundle CRUD
   static List<BundelModel> getAllBundles() {
-    return bundlesBox.values
-        .map((json) =>
-            BundelModel.fromMap(Map<String, dynamic>.from(jsonDecode(json))))
-        .toList()
-      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    return bundlesBox.values.map((json) => BundelModel.fromMap(Map<String, dynamic>.from(jsonDecode(json)))).toList()..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
   }
 
   static Future<void> saveBundle(BundelModel bundle) async {
@@ -108,21 +108,16 @@ class HiveService {
   static SettingsModel getSettings() {
     final json = settingsBox.get(AppConstants.settingsKey);
     if (json == null) return SettingsModel.defaults();
-    return SettingsModel.fromMap(
-        Map<String, dynamic>.from(jsonDecode(json)));
+    return SettingsModel.fromMap(Map<String, dynamic>.from(jsonDecode(json)));
   }
 
   static Future<void> saveSettings(SettingsModel settings) async {
-    await settingsBox.put(
-        AppConstants.settingsKey, jsonEncode(settings.toMap()));
+    await settingsBox.put(AppConstants.settingsKey, jsonEncode(settings.toMap()));
   }
 
   // Template CRUD
   static List<TemplateModel> getAllTemplates() {
-    return templatesBox.values
-        .map((json) =>
-            TemplateModel.fromMap(Map<String, dynamic>.from(jsonDecode(json))))
-        .toList()
+    return templatesBox.values.map((json) => TemplateModel.fromMap(Map<String, dynamic>.from(jsonDecode(json)))).toList()
       ..sort((a, b) => a.isBuiltIn
           ? -1
           : b.isBuiltIn

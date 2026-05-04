@@ -1,3 +1,5 @@
+const Object _sentinel = Object();
+
 class SettingsModel {
   final String themePreset; // biru, lavender, mint, peach, rose
   final bool darkMode;
@@ -9,6 +11,11 @@ class SettingsModel {
   final int autoSaveInterval; // seconds: 5, 10, 30
   final String? customPrimaryColor; // hex string
 
+  // Security – lockMode: 'none' | 'biometric' | 'pin' | 'both'
+  final String lockMode;
+  final String? pinHash; // SHA-256(salt:pin)
+  final String? pinSalt; // random UUID per device
+
   const SettingsModel({
     this.themePreset = 'biru',
     this.darkMode = false,
@@ -19,7 +26,16 @@ class SettingsModel {
     this.defaultBackground = 'solid',
     this.autoSaveInterval = 10,
     this.customPrimaryColor,
+    this.lockMode = 'none',
+    this.pinHash,
+    this.pinSalt,
   });
+
+  /// True when biometric auth is required on app open.
+  bool get biometricEnabled => lockMode == 'biometric' || lockMode == 'both';
+
+  /// True when PIN auth is required on app open.
+  bool get pinEnabled => lockMode == 'pin' || lockMode == 'both';
 
   static SettingsModel defaults() => const SettingsModel();
 
@@ -33,9 +49,15 @@ class SettingsModel {
         'defaultBackground': defaultBackground,
         'autoSaveInterval': autoSaveInterval,
         'customPrimaryColor': customPrimaryColor,
+        'lockMode': lockMode,
+        'pinHash': pinHash,
+        'pinSalt': pinSalt,
       };
 
   factory SettingsModel.fromMap(Map<String, dynamic> map) {
+    // Backward compat: old biometricEnabled:true => lockMode:'biometric'
+    final oldBio = map['biometricEnabled'] as bool? ?? false;
+    final lockMode = map['lockMode'] as String? ?? (oldBio ? 'biometric' : 'none');
     return SettingsModel(
       themePreset: map['themePreset'] as String? ?? 'biru',
       darkMode: map['darkMode'] as bool? ?? false,
@@ -46,6 +68,9 @@ class SettingsModel {
       defaultBackground: map['defaultBackground'] as String? ?? 'solid',
       autoSaveInterval: (map['autoSaveInterval'] as num?)?.toInt() ?? 10,
       customPrimaryColor: map['customPrimaryColor'] as String?,
+      lockMode: lockMode,
+      pinHash: map['pinHash'] as String?,
+      pinSalt: map['pinSalt'] as String?,
     );
   }
 
@@ -59,6 +84,9 @@ class SettingsModel {
     String? defaultBackground,
     int? autoSaveInterval,
     Object? customPrimaryColor = _sentinel,
+    String? lockMode,
+    Object? pinHash = _sentinel,
+    Object? pinSalt = _sentinel,
   }) {
     return SettingsModel(
       themePreset: themePreset ?? this.themePreset,
@@ -69,11 +97,10 @@ class SettingsModel {
       showMetadata: showMetadata ?? this.showMetadata,
       defaultBackground: defaultBackground ?? this.defaultBackground,
       autoSaveInterval: autoSaveInterval ?? this.autoSaveInterval,
-      customPrimaryColor: customPrimaryColor == _sentinel
-          ? this.customPrimaryColor
-          : customPrimaryColor as String?,
+      customPrimaryColor: customPrimaryColor == _sentinel ? this.customPrimaryColor : customPrimaryColor as String?,
+      lockMode: lockMode ?? this.lockMode,
+      pinHash: pinHash == _sentinel ? this.pinHash : pinHash as String?,
+      pinSalt: pinSalt == _sentinel ? this.pinSalt : pinSalt as String?,
     );
   }
 }
-
-const Object _sentinel = Object();

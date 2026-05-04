@@ -57,6 +57,15 @@ dependencies:
   # File picker
   file_picker: ^8.0.0
 
+  # Biometric authentication
+  local_auth: ^2.3.0
+
+  # Home screen widget
+  home_widget: ^0.6.0
+
+  # PIN hashing
+  crypto: ^3.0.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

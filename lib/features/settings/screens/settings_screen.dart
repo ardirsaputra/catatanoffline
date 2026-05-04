@@ -1,7 +1,11 @@
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 import '../../../app/theme/color_schemes.dart';
+import '../../../features/auth/providers/auth_provider.dart';
+import '../../../features/auth/services/biometric_service.dart';
+import '../../../features/auth/widgets/pin_pad_widget.dart';
 import '../../../features/berkas/providers/category_provider.dart';
 import '../../../shared/models/category_model.dart';
 import '../../../shared/models/settings_model.dart';
@@ -97,6 +101,13 @@ class SettingsScreen extends ConsumerWidget {
                 value: settings.darkMode,
                 onChanged: (v) => ref.read(settingsProvider.notifier).setDarkMode(v),
               ),
+
+              const Divider(height: 16),
+
+              // ── Keamanan ─────────────────────────────────────────────────
+              _SectionHeader(title: 'Keamanan', icon: '🔒'),
+              _LockModeTile(settings: settings, ref: ref),
+              if (settings.pinEnabled) _PinSetupTile(settings: settings, ref: ref),
 
               const Divider(height: 16),
 
@@ -667,6 +678,222 @@ class _CategoryFormState extends State<_CategoryForm> {
     setState(() => _saving = true);
     await widget.onSave(name, _selectedIcon, _selectedColor);
     if (mounted) setState(() => _saving = false);
+  }
+}
+
+// ── Lock Mode Tile ────────────────────────────────────────────────────────────
+
+class _LockModeTile extends ConsumerStatefulWidget {
+  final SettingsModel settings;
+  final WidgetRef ref;
+
+  const _LockModeTile({required this.settings, required this.ref});
+
+  @override
+  ConsumerState<_LockModeTile> createState() => _LockModeTileState();
+}
+
+class _LockModeTileState extends ConsumerState<_LockModeTile> {
+  bool _loading = false;
+
+  static const _modes = {
+    'none': 'Tidak ada (bebas akses)',
+    'biometric': 'Sidik Jari / Biometrik',
+    'pin': 'PIN',
+    'both': 'Biometrik + PIN (keduanya)',
+  };
+
+  Future<void> _select(String mode) async {
+    if (mode == widget.settings.lockMode) return;
+    // Validate biometric availability
+    if (mode == 'biometric' || mode == 'both') {
+      setState(() => _loading = true);
+      final ok = await BiometricService.isAvailable();
+      setState(() => _loading = false);
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Perangkat tidak mendukung biometrik atau sidik jari belum terdaftar.'),
+        ));
+        if (mode == 'biometric') return;
+        mode = 'pin'; // fallback to PIN-only if 'both' but no biometric
+      }
+    }
+    // Need PIN setup when enabling PIN
+    if ((mode == 'pin' || mode == 'both') && (widget.settings.pinHash == null)) {
+      final pin = await _showPinSetup(context);
+      if (pin == null) return; // cancelled
+      const uuid = Uuid();
+      final salt = uuid.v4();
+      final hash = hashAppPin(pin, salt);
+      await widget.ref.read(settingsProvider.notifier).setPin(pinHash: hash, pinSalt: salt, lockMode: mode);
+    } else {
+      await widget.ref.read(settingsProvider.notifier).setLockMode(mode);
+    }
+    if (mode == 'none') {
+      widget.ref.read(authProvider.notifier).bypassAuth();
+    }
+  }
+
+  Future<String?> _showPinSetup(BuildContext context) {
+    return showModalBottomSheet<String?>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const _PinSetupSheet(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      dense: true,
+      visualDensity: VisualDensity.compact,
+      leading: _loading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.lock_outline, size: 20),
+      title: const Text('Kunci Aplikasi', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w500, fontSize: 13)),
+      subtitle: Text(_modes[widget.settings.lockMode] ?? 'Tidak ada', style: const TextStyle(fontFamily: 'Poppins', fontSize: 11)),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 12),
+      onTap: _loading
+          ? null
+          : () => showModalBottomSheet(
+                context: context,
+                builder: (_) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(padding: const EdgeInsets.all(16), child: Text('Kunci Aplikasi', style: const TextStyle(fontFamily: 'Poppins', fontSize: 16, fontWeight: FontWeight.w700))),
+                    ..._modes.entries.map((e) => RadioListTile<String>(
+                          title: Text(e.value, style: const TextStyle(fontFamily: 'Poppins', fontSize: 13)),
+                          value: e.key,
+                          groupValue: widget.settings.lockMode,
+                          onChanged: (v) {
+                            Navigator.pop(context);
+                            if (v != null) _select(v);
+                          },
+                        )),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+    );
+  }
+}
+
+// ── PIN Setup Tile ─────────────────────────────────────────────────────────────
+
+class _PinSetupTile extends StatelessWidget {
+  final SettingsModel settings;
+  final WidgetRef ref;
+
+  const _PinSetupTile({required this.settings, required this.ref});
+
+  @override
+  Widget build(BuildContext context) {
+    final pinSet = settings.pinHash != null;
+    return ListTile(
+      dense: true,
+      visualDensity: VisualDensity.compact,
+      leading: const Icon(Icons.pin_outlined, size: 20),
+      title: const Text('PIN', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w500, fontSize: 13)),
+      subtitle: Text(pinSet ? 'PIN sudah diatur — ketuk untuk mengubah' : 'PIN belum diatur', style: const TextStyle(fontFamily: 'Poppins', fontSize: 11)),
+      trailing: Text(pinSet ? 'Ubah' : 'Atur', style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600)),
+      onTap: () async {
+        final pin = await showModalBottomSheet<String?>(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => const _PinSetupSheet(),
+        );
+        if (pin != null) {
+          const uuid = Uuid();
+          final salt = uuid.v4();
+          final hash = hashAppPin(pin, salt);
+          await ref.read(settingsProvider.notifier).setPin(pinHash: hash, pinSalt: salt, lockMode: settings.lockMode);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('PIN berhasil diatur.')),
+            );
+          }
+        }
+      },
+    );
+  }
+}
+
+// ── PIN Setup Bottom Sheet ────────────────────────────────────────────────────
+
+class _PinSetupSheet extends StatefulWidget {
+  const _PinSetupSheet();
+
+  @override
+  State<_PinSetupSheet> createState() => _PinSetupSheetState();
+}
+
+class _PinSetupSheetState extends State<_PinSetupSheet> {
+  String? _firstPin;
+  String? _error;
+  int _attempt = 0;
+  bool _confirming = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF6C63FF), Color(0xFF957FEF)],
+        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.40), borderRadius: BorderRadius.circular(2))),
+          const SizedBox(height: 20),
+          Text(
+            _confirming ? 'Konfirmasi PIN baru' : 'Masukkan PIN baru',
+            style: const TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'PIN 6 digit',
+            style: TextStyle(fontFamily: 'Poppins', fontSize: 12, color: Colors.white.withOpacity(0.70)),
+          ),
+          const SizedBox(height: 28),
+          PinPadWidget(
+            key: ValueKey(_attempt),
+            pinLength: 6,
+            errorText: _error,
+            onComplete: (pin) {
+              if (!_confirming) {
+                setState(() {
+                  _firstPin = pin;
+                  _confirming = true;
+                  _error = null;
+                  _attempt++;
+                });
+              } else {
+                if (pin == _firstPin) {
+                  Navigator.pop(context, pin);
+                } else {
+                  setState(() {
+                    _error = 'PIN tidak cocok. Coba lagi.';
+                    _firstPin = null;
+                    _confirming = false;
+                    _attempt++;
+                  });
+                }
+              }
+            },
+          ),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: () => Navigator.pop(context, null),
+            child: Text('Batal', style: TextStyle(fontFamily: 'Poppins', color: Colors.white.withOpacity(0.75), fontSize: 13)),
+          ),
+        ],
+      ),
+    );
   }
 }
 

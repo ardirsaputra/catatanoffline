@@ -8,8 +8,10 @@ class AppConstants {
   static const String boxBundles = 'bundles';
   static const String boxSettings = 'settings';
   static const String boxTemplates = 'templates';
+  static const String boxAuth = 'auth';
 
   static const String settingsKey = 'app_settings';
+  static const String authKey = 'auth_state';
 
   // Default categories
   static const List<Map<String, String>> defaultCategories = [
