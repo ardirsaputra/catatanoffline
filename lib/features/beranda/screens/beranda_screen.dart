@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../shared/models/berkas_model.dart';
-import '../../shared/utils/date_formatter.dart';
-import '../../features/berkas/providers/berkas_provider.dart';
-import '../../features/berkas/providers/category_provider.dart';
-import '../../features/editor/screens/editor_screen.dart';
-import '../../features/berkas/screens/berkas_list_screen.dart';
+import '../../../shared/models/berkas_model.dart';
+import '../../../shared/utils/date_formatter.dart';
+import '../../berkas/providers/berkas_provider.dart';
+import '../../berkas/providers/category_provider.dart';
+import '../../editor/screens/editor_screen.dart';
+import '../../berkas/screens/berkas_list_screen.dart';
+import '../../editor/providers/editor_provider.dart';
 
 class BerandaScreen extends ConsumerWidget {
   const BerandaScreen({super.key});
@@ -216,9 +217,6 @@ class BerandaScreen extends ConsumerWidget {
     );
   }
 }
-
-// ignore: library_private_types_in_public_api
-import '../../features/editor/providers/editor_provider.dart';
 
 class _QuickActionCard extends StatelessWidget {
   final String emoji;

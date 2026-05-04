@@ -244,13 +244,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       messenger.showSnackBar(
         const SnackBar(content: Text('Mengekspor dokumen...')),
       );
-      await ExportService.exportBerkasToDocx(
-        berkas,
-        orientation: options['orientation'] as String,
-        includeCover: options['includeCover'] as bool,
-        includeToc: options['includeToc'] as bool,
-        fontFamily: options['font'] as String,
-      );
+      await ExportService.exportBerkasToDocx(berkas);
       if (mounted) {
         messenger.hideCurrentSnackBar();
         messenger.showSnackBar(

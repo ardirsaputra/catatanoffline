@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../shared/models/berkas_model.dart';
-import '../../shared/models/section_model.dart';
-import '../../data/repositories/berkas_repository.dart';
-import '../berkas/providers/berkas_provider.dart';
+import '../../../shared/models/berkas_model.dart';
+import '../../../shared/models/section_model.dart';
+import '../../../data/repositories/berkas_repository.dart';
+import '../../berkas/providers/berkas_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class EditorState {

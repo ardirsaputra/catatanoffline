@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../shared/models/template_model.dart';
-import '../../data/repositories/template_repository.dart';
-import '../../shared/models/section_model.dart';
+import '../../../shared/models/template_model.dart';
+import '../../../data/repositories/template_repository.dart';
+import '../../../shared/models/section_model.dart';
 
 final templateRepositoryProvider = Provider<TemplateRepository>(
   (_) => TemplateRepository(),

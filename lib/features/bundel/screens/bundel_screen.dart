@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../shared/models/bundel_model.dart';
-import '../../shared/utils/date_formatter.dart';
-import '../../shared/widgets/empty_state.dart';
-import '../bundel/providers/bundel_provider.dart';
-import '../berkas/providers/berkas_provider.dart';
-import '../berkas/providers/category_provider.dart';
+import '../../../shared/models/bundel_model.dart';
+import '../../../shared/utils/date_formatter.dart';
+import '../../../shared/widgets/empty_state.dart';
+import '../providers/bundel_provider.dart';
+import '../../berkas/providers/berkas_provider.dart';
+import '../../berkas/providers/category_provider.dart';
 import 'bundel_detail_screen.dart';
 
 class BundelScreen extends ConsumerWidget {

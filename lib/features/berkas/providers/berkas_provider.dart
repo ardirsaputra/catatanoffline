@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../shared/models/berkas_model.dart';
-import '../../data/repositories/berkas_repository.dart';
+import '../../../shared/models/berkas_model.dart';
+import '../../../data/repositories/berkas_repository.dart';
 import 'package:uuid/uuid.dart';
 
 final berkasRepositoryProvider = Provider<BerkasRepository>(

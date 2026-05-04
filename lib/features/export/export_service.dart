@@ -5,9 +5,9 @@ import 'package:archive/archive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:share_plus/share_plus.dart';
-import '../../shared/models/berkas_model.dart';
-import '../../shared/models/bundel_model.dart';
-import '../../shared/models/section_model.dart';
+import '../../../shared/models/berkas_model.dart';
+import '../../../shared/models/bundel_model.dart';
+import '../../../shared/models/section_model.dart';
 
 /// Exports BerkasModel or BundelModel to .docx and shares via system share sheet.
 class ExportService {

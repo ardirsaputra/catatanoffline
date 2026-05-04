@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../shared/models/berkas_model.dart';
-import '../../shared/models/template_model.dart';
-import '../../shared/utils/constants.dart';
-import '../../shared/utils/date_formatter.dart';
-import '../../shared/widgets/empty_state.dart';
+import '../../../shared/models/berkas_model.dart';
+import '../../../shared/models/template_model.dart';
+import '../../../shared/utils/constants.dart';
+import '../../../shared/utils/date_formatter.dart';
+import '../../../shared/widgets/empty_state.dart';
 import '../providers/berkas_provider.dart';
 import '../providers/category_provider.dart';
 import '../../editor/providers/editor_provider.dart';
@@ -62,9 +62,7 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
           IconButton(
             icon: Icon(isGrid ? Icons.view_list : Icons.grid_view),
             tooltip: isGrid ? 'Tampilan Daftar' : 'Tampilan Grid',
-            onPressed: () => ref
-                .read(settingsProvider.notifier)
-                .setDefaultView(isGrid ? 'list' : 'grid'),
+            onPressed: () => ref.read(settingsProvider.notifier).setDefaultView(isGrid ? 'list' : 'grid'),
           ),
           IconButton(
             icon: const Icon(Icons.sort),
@@ -81,8 +79,7 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                 child: TextField(
                   controller: _searchController,
-                  onChanged: (v) =>
-                      ref.read(berkasSearchQueryProvider.notifier).state = v,
+                  onChanged: (v) => ref.read(berkasSearchQueryProvider.notifier).state = v,
                   decoration: InputDecoration(
                     hintText: 'Cari berkas...',
                     prefixIcon: const Icon(Icons.search, size: 20),
@@ -91,16 +88,13 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
                             icon: const Icon(Icons.clear, size: 20),
                             onPressed: () {
                               _searchController.clear();
-                              ref
-                                  .read(berkasSearchQueryProvider.notifier)
-                                  .state = '';
+                              ref.read(berkasSearchQueryProvider.notifier).state = '';
                             },
                           )
                         : null,
                     filled: true,
                     fillColor: colorScheme.surface,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -120,9 +114,7 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
                       child: FilterChip(
                         label: const Text('Semua'),
                         selected: selectedCat == null,
-                        onSelected: (_) => ref
-                            .read(berkasSelectedCategoryProvider.notifier)
-                            .state = null,
+                        onSelected: (_) => ref.read(berkasSelectedCategoryProvider.notifier).state = null,
                       ),
                     ),
                     ...categories.map((cat) => Padding(
@@ -130,10 +122,7 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
                           child: FilterChip(
                             label: Text('${cat.iconName} ${cat.name}'),
                             selected: selectedCat == cat.id,
-                            onSelected: (_) => ref
-                                .read(berkasSelectedCategoryProvider.notifier)
-                                .state =
-                                selectedCat == cat.id ? null : cat.id,
+                            onSelected: (_) => ref.read(berkasSelectedCategoryProvider.notifier).state = selectedCat == cat.id ? null : cat.id,
                           ),
                         )),
                   ],
@@ -148,8 +137,7 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
           ? EmptyStateWidget(
               emoji: '📂',
               title: 'Belum Ada Berkas',
-              subtitle:
-                  'Tekan tombol + untuk membuat berkas baru.\nAnda bisa memilih template atau mulai dari awal.',
+              subtitle: 'Tekan tombol + untuk membuat berkas baru.\nAnda bisa memilih template atau mulai dari awal.',
               actionLabel: 'Buat Berkas Pertama',
               onAction: () => _showCreateDialog(),
             )
@@ -166,7 +154,11 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
 
   Widget _buildGrid(List<BerkasModel> berkas, dynamic categories, dynamic settings) {
     final cardSize = (settings as dynamic).cardSize as String;
-    final crossAxisCount = cardSize == 'compact' ? 3 : cardSize == 'large' ? 1 : 2;
+    final crossAxisCount = cardSize == 'compact'
+        ? 3
+        : cardSize == 'large'
+            ? 1
+            : 2;
     return GridView.builder(
       padding: const EdgeInsets.all(16),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -178,10 +170,7 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
       itemCount: berkas.length,
       itemBuilder: (context, index) {
         final item = berkas[index];
-        final cat = categories.firstWhere(
-          (c) => c.id == item.categoryId,
-          orElse: () => null,
-        );
+        final cat = categories?.where((c) => c.id == item.categoryId).firstOrNull;
         return _BerkasGridCard(
           berkas: item,
           categoryName: cat?.name ?? 'Umum',
@@ -199,10 +188,7 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
       itemCount: berkas.length,
       itemBuilder: (context, index) {
         final item = berkas[index];
-        final cat = categories.firstWhere(
-          (c) => c.id == item.categoryId,
-          orElse: () => null,
-        );
+        final cat = categories?.where((c) => c.id == item.categoryId).firstOrNull;
         return _BerkasListItem(
           berkas: item,
           categoryName: cat?.name ?? 'Umum',
@@ -245,16 +231,14 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Hapus Berkas?'),
-        content: Text(
-            'Berkas "${berkas.title}" akan dihapus secara permanen.'),
+        content: Text('Berkas "${berkas.title}" akan dihapus secara permanen.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: const Text('Batal'),
           ),
           TextButton(
-            style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error),
+            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Hapus'),
           ),
@@ -294,8 +278,7 @@ class _BerkasGridCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     Color tagColor;
     try {
-      tagColor = Color(
-          int.parse('FF${berkas.colorTag.replaceFirst('#', '')}', radix: 16));
+      tagColor = Color(int.parse('FF${berkas.colorTag.replaceFirst('#', '')}', radix: 16));
     } catch (_) {
       tagColor = colorScheme.primary;
     }
@@ -319,8 +302,7 @@ class _BerkasGridCard extends StatelessWidget {
                           color: tagColor.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Text(berkas.iconName,
-                            style: const TextStyle(fontSize: 20)),
+                        child: Text(berkas.iconName, style: const TextStyle(fontSize: 20)),
                       ),
                       const Spacer(),
                       Container(
@@ -371,13 +353,10 @@ class _BerkasGridCard extends StatelessWidget {
               top: 4,
               right: 4,
               child: PopupMenuButton<String>(
-                icon: Icon(Icons.more_vert,
-                    size: 18, color: colorScheme.onSurfaceVariant),
+                icon: Icon(Icons.more_vert, size: 18, color: colorScheme.onSurfaceVariant),
                 itemBuilder: (_) => [
-                  const PopupMenuItem(
-                      value: 'edit', child: Text('Edit')),
-                  const PopupMenuItem(
-                      value: 'delete', child: Text('Hapus')),
+                  const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                  const PopupMenuItem(value: 'delete', child: Text('Hapus')),
                 ],
                 onSelected: (val) {
                   if (val == 'edit') onTap();
@@ -414,8 +393,7 @@ class _BerkasListItem extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     Color tagColor;
     try {
-      tagColor = Color(
-          int.parse('FF${berkas.colorTag.replaceFirst('#', '')}', radix: 16));
+      tagColor = Color(int.parse('FF${berkas.colorTag.replaceFirst('#', '')}', radix: 16));
     } catch (_) {
       tagColor = colorScheme.primary;
     }
@@ -437,8 +415,7 @@ class _BerkasListItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
-                  child: Text(berkas.iconName,
-                      style: const TextStyle(fontSize: 24)),
+                  child: Text(berkas.iconName, style: const TextStyle(fontSize: 24)),
                 ),
               ),
               const SizedBox(width: 14),
@@ -461,17 +438,14 @@ class _BerkasListItem extends StatelessWidget {
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
                               color: tagColor.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               categoryName,
-                              style: GoogleFonts.poppins(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500),
+                              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w500),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -497,13 +471,10 @@ class _BerkasListItem extends StatelessWidget {
                 ),
               ),
               PopupMenuButton<String>(
-                icon: Icon(Icons.more_vert,
-                    color: colorScheme.onSurfaceVariant),
+                icon: Icon(Icons.more_vert, color: colorScheme.onSurfaceVariant),
                 itemBuilder: (_) => [
-                  const PopupMenuItem(
-                      value: 'edit', child: Text('Buka')),
-                  const PopupMenuItem(
-                      value: 'delete', child: Text('Hapus')),
+                  const PopupMenuItem(value: 'edit', child: Text('Buka')),
+                  const PopupMenuItem(value: 'delete', child: Text('Hapus')),
                 ],
                 onSelected: (val) {
                   if (val == 'edit') onTap();
@@ -550,9 +521,11 @@ class _CreateBerkasSheetState extends ConsumerState<_CreateBerkasSheet> {
       }
       if (widget.preselectedTemplateId != null) {
         final templates = ref.read(templateProvider);
-        final tmpl = templates.where(
-          (t) => t.id == widget.preselectedTemplateId,
-        ).firstOrNull;
+        final tmpl = templates
+            .where(
+              (t) => t.id == widget.preselectedTemplateId,
+            )
+            .firstOrNull;
         if (tmpl != null) {
           setState(() {
             _selectedTemplate = tmpl;
@@ -604,8 +577,7 @@ class _CreateBerkasSheetState extends ConsumerState<_CreateBerkasSheet> {
             const SizedBox(height: 20),
             Text(
               'Buat Berkas Baru',
-              style: GoogleFonts.poppins(
-                  fontSize: 18, fontWeight: FontWeight.w700),
+              style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 20),
 
@@ -633,15 +605,12 @@ class _CreateBerkasSheetState extends ConsumerState<_CreateBerkasSheet> {
                           child: Text('${c.iconName} ${c.name}'),
                         ))
                     .toList(),
-                onChanged: (v) =>
-                    setState(() => _selectedCategoryId = v ?? ''),
+                onChanged: (v) => setState(() => _selectedCategoryId = v ?? ''),
               ),
             const SizedBox(height: 16),
 
             // Icon picker
-            Text('Ikon',
-                style: GoogleFonts.poppins(
-                    fontSize: 13, fontWeight: FontWeight.w600)),
+            Text('Ikon', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             SizedBox(
               height: 48,
@@ -649,25 +618,18 @@ class _CreateBerkasSheetState extends ConsumerState<_CreateBerkasSheet> {
                 scrollDirection: Axis.horizontal,
                 children: AppConstants.cardIcons
                     .map((icon) => GestureDetector(
-                          onTap: () =>
-                              setState(() => _selectedIcon = icon),
+                          onTap: () => setState(() => _selectedIcon = icon),
                           child: Container(
                             width: 44,
                             height: 44,
                             margin: const EdgeInsets.only(right: 8),
                             decoration: BoxDecoration(
-                              color: _selectedIcon == icon
-                                  ? colorScheme.primary.withOpacity(0.3)
-                                  : colorScheme.surfaceContainerHighest,
+                              color: _selectedIcon == icon ? colorScheme.primary.withOpacity(0.3) : colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(10),
-                              border: _selectedIcon == icon
-                                  ? Border.all(
-                                      color: colorScheme.primary, width: 2)
-                                  : null,
+                              border: _selectedIcon == icon ? Border.all(color: colorScheme.primary, width: 2) : null,
                             ),
                             child: Center(
-                              child: Text(icon,
-                                  style: const TextStyle(fontSize: 20)),
+                              child: Text(icon, style: const TextStyle(fontSize: 20)),
                             ),
                           ),
                         ))
@@ -677,47 +639,34 @@ class _CreateBerkasSheetState extends ConsumerState<_CreateBerkasSheet> {
             const SizedBox(height: 16),
 
             // Color tag
-            Text('Warna Tag',
-                style: GoogleFonts.poppins(
-                    fontSize: 13, fontWeight: FontWeight.w600)),
+            Text('Warna Tag', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             SizedBox(
               height: 36,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children: AppConstants.colorTags
-                    .map((color) {
-                      final c = Color(int.parse(
-                          'FF${color.replaceFirst('#', '')}',
-                          radix: 16));
-                      return GestureDetector(
-                        onTap: () =>
-                            setState(() => _selectedColor = color),
-                        child: Container(
-                          width: 32,
-                          height: 32,
-                          margin: const EdgeInsets.only(right: 8),
-                          decoration: BoxDecoration(
-                            color: c,
-                            shape: BoxShape.circle,
-                            border: _selectedColor == color
-                                ? Border.all(
-                                    color: Colors.black38, width: 2.5)
-                                : Border.all(
-                                    color: Colors.black12, width: 1),
-                          ),
-                        ),
-                      );
-                    })
-                    .toList(),
+                children: AppConstants.colorTags.map((color) {
+                  final c = Color(int.parse('FF${color.replaceFirst('#', '')}', radix: 16));
+                  return GestureDetector(
+                    onTap: () => setState(() => _selectedColor = color),
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: c,
+                        shape: BoxShape.circle,
+                        border: _selectedColor == color ? Border.all(color: Colors.black38, width: 2.5) : Border.all(color: Colors.black12, width: 1),
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
             ),
             const SizedBox(height: 20),
 
             // Template picker
-            Text('Template',
-                style: GoogleFonts.poppins(
-                    fontSize: 13, fontWeight: FontWeight.w600)),
+            Text('Template', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             SizedBox(
               height: 90,
@@ -734,25 +683,17 @@ class _CreateBerkasSheetState extends ConsumerState<_CreateBerkasSheet> {
                             margin: const EdgeInsets.only(right: 10),
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: _selectedTemplate?.id == tmpl.id
-                                  ? colorScheme.primary.withOpacity(0.2)
-                                  : colorScheme.surfaceContainerHighest,
+                              color: _selectedTemplate?.id == tmpl.id ? colorScheme.primary.withOpacity(0.2) : colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(12),
-                              border: _selectedTemplate?.id == tmpl.id
-                                  ? Border.all(
-                                      color: colorScheme.primary, width: 2)
-                                  : null,
+                              border: _selectedTemplate?.id == tmpl.id ? Border.all(color: colorScheme.primary, width: 2) : null,
                             ),
                             child: Column(
                               children: [
-                                Text(tmpl.iconEmoji,
-                                    style: const TextStyle(fontSize: 24)),
+                                Text(tmpl.iconEmoji, style: const TextStyle(fontSize: 24)),
                                 const SizedBox(height: 4),
                                 Text(
                                   tmpl.name,
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w500),
+                                  style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w500),
                                   textAlign: TextAlign.center,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,

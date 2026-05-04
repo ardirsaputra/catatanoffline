@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 import '../../../../shared/models/section_model.dart';
 
@@ -68,15 +67,15 @@ class _TeksBebasWidgetState extends State<TeksBebasWidget> {
         // Toolbar
         Container(
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(8),
           ),
           child: quill.QuillSimpleToolbar(
-            controller: _controller,
             configurations: quill.QuillSimpleToolbarConfigurations(
+              controller: _controller,
               toolbarIconAlignment: WrapAlignment.start,
               showFontFamily: false,
-              showFontSize: true,
+              showFontSize: false,
               showBoldButton: true,
               showItalicButton: true,
               showUnderLineButton: true,
@@ -85,11 +84,7 @@ class _TeksBebasWidgetState extends State<TeksBebasWidget> {
               showColorButton: true,
               showBackgroundColorButton: false,
               showClearFormat: true,
-              showAlignmentButtons: true,
-              showLeftAlignment: true,
-              showCenterAlignment: true,
-              showRightAlignment: true,
-              showJustifyAlignment: false,
+              showAlignmentButtons: false,
               showHeaderStyle: true,
               showListNumbers: true,
               showListBullets: true,
@@ -101,11 +96,6 @@ class _TeksBebasWidgetState extends State<TeksBebasWidget> {
               showUndo: true,
               showRedo: true,
               showSearchButton: false,
-              buttonOptions: quill.QuillSimpleToolbarButtonOptions(
-                base: quill.QuillToolbarBaseButtonOptions(
-                  iconSize: 18,
-                ),
-              ),
             ),
           ),
         ),
@@ -118,35 +108,22 @@ class _TeksBebasWidgetState extends State<TeksBebasWidget> {
             maxHeight: _expanded ? 600 : 240,
           ),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: colorScheme.outlineVariant),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: quill.QuillEditor(
-              controller: _controller,
               focusNode: _focusNode,
               scrollController: _scrollController,
               configurations: quill.QuillEditorConfigurations(
+                controller: _controller,
                 padding: const EdgeInsets.all(12),
                 autoFocus: false,
                 expands: false,
                 scrollable: true,
                 placeholder: 'Tulis teks bebas di sini...',
-                customStyles: quill.DefaultStyles(
-                  paragraph: quill.DefaultTextBlockStyle(
-                    GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: colorScheme.onSurface,
-                      height: 1.6,
-                    ),
-                    const quill.HorizontalSpacing(0, 0),
-                    const quill.VerticalSpacing(0, 0),
-                    const quill.VerticalSpacing(0, 0),
-                    null,
-                  ),
-                ),
               ),
             ),
           ),

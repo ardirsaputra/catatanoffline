@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../shared/models/bundel_model.dart';
-import '../../data/repositories/bundel_repository.dart';
+import '../../../shared/models/bundel_model.dart';
+import '../../../data/repositories/bundel_repository.dart';
 import 'package:uuid/uuid.dart';
 
 final bundelRepositoryProvider = Provider<BundelRepository>(

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../shared/models/settings_model.dart';
-import '../../data/repositories/settings_repository.dart';
+import '../../../shared/models/settings_model.dart';
+import '../../../data/repositories/settings_repository.dart';
 
 final settingsRepositoryProvider = Provider<SettingsRepository>(
   (_) => SettingsRepository(),

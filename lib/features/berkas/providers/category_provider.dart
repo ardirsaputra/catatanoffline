@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../shared/models/category_model.dart';
-import '../../data/repositories/category_repository.dart';
+import '../../../shared/models/category_model.dart';
+import '../../../data/repositories/category_repository.dart';
 import 'package:uuid/uuid.dart';
 
 final categoryRepositoryProvider = Provider<CategoryRepository>(
