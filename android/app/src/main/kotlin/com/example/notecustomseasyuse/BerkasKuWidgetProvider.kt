@@ -56,14 +56,14 @@ class BerkasKuWidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int
     ) {
-        val prefs = context.getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+        val prefs = context.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
 
-        val recent1 = prefs.getString("flutter.widget_recent_1", "") ?: ""
-        val recent2 = prefs.getString("flutter.widget_recent_2", "") ?: ""
-        val recent3 = prefs.getString("flutter.widget_recent_3", "") ?: ""
-        val icon1   = prefs.getString("flutter.widget_icon_1", "📝") ?: "📝"
-        val icon2   = prefs.getString("flutter.widget_icon_2", "📝") ?: "📝"
-        val icon3   = prefs.getString("flutter.widget_icon_3", "📝") ?: "📝"
+        val recent1 = prefs.getString("widget_recent_1", "") ?: ""
+        val recent2 = prefs.getString("widget_recent_2", "") ?: ""
+        val recent3 = prefs.getString("widget_recent_3", "") ?: ""
+        val icon1   = prefs.getString("widget_icon_1", "") ?: ""
+        val icon2   = prefs.getString("widget_icon_2", "") ?: ""
+        val icon3   = prefs.getString("widget_icon_3", "") ?: ""
 
         val views = RemoteViews(context.packageName, R.layout.berkaskyu_widget)
 
