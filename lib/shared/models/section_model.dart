@@ -63,9 +63,7 @@ class SectionModel {
         orElse: () => SectionType.teksBebas,
       ),
       order: (map['order'] as num).toInt(),
-      data: map['data'] is String
-          ? Map<String, dynamic>.from(jsonDecode(map['data'] as String) as Map)
-          : Map<String, dynamic>.from(map['data'] as Map? ?? {}),
+      data: map['data'] is String ? Map<String, dynamic>.from(jsonDecode(map['data'] as String) as Map) : Map<String, dynamic>.from(map['data'] as Map? ?? {}),
     );
   }
 
@@ -86,15 +84,16 @@ class SectionModel {
   // ── Default data factories ──────────────────────────────────────────────────
 
   static Map<String, dynamic> defaultWawancara() => {
-        'question': 'Pertanyaan wawancara',
+        'question': '',
         'answer': '',
       };
 
   static Map<String, dynamic> defaultChecklist() => {
-        'title': 'Daftar Periksa',
+        'title': '',
         'items': <Map<String, dynamic>>[
-          {'id': 'item_1', 'text': 'Item 1', 'checked': false},
-          {'id': 'item_2', 'text': 'Item 2', 'checked': false},
+          {'id': 'item_1', 'text': '', 'checked': false},
+          {'id': 'item_2', 'text': '', 'checked': false},
+          {'id': 'item_3', 'text': '', 'checked': false},
         ],
       };
 
@@ -102,20 +101,20 @@ class SectionModel {
         'questions': <Map<String, dynamic>>[
           {
             'id': 'q_1',
-            'question': 'Pertanyaan pilihan ganda',
-            'options': ['Opsi A', 'Opsi B', 'Opsi C'],
+            'question': '',
+            'options': ['', '', ''],
             'selectedIndex': null,
           }
         ],
       };
 
   static Map<String, dynamic> defaultEsai() => {
-        'question': 'Pertanyaan esai',
+        'question': '',
         'answer': '',
       };
 
   static Map<String, dynamic> defaultTandaTangan() => {
-        'label': 'Tanda Tangan',
+        'label': '',
         'signatureBase64': null,
         'signerName': '',
       };
@@ -126,7 +125,7 @@ class SectionModel {
       };
 
   static Map<String, dynamic> defaultTabel() => {
-        'headers': ['Kolom 1', 'Kolom 2', 'Kolom 3'],
+        'headers': ['Nomor', 'Uraian', ''],
         'rows': [
           ['', '', ''],
           ['', '', ''],

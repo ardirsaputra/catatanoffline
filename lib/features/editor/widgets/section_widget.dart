@@ -28,13 +28,13 @@ class SectionWidget extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header bar
           Container(
-            padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
+            padding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
             decoration: BoxDecoration(
               color: colorScheme.primaryContainer.withOpacity(0.4),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
@@ -74,7 +74,7 @@ class SectionWidget extends StatelessWidget {
 
           // Content
           Padding(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(10),
             child: _buildContent(context),
           ),
         ],

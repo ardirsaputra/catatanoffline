@@ -172,7 +172,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           berkas.sections.isEmpty
               ? _EmptyEditor(onAddSection: _showAddSection)
               : ReorderableListView.builder(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 100),
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 100),
                   buildDefaultDragHandles: false,
                   itemCount: berkas.sections.length,
                   onReorder: (oldIndex, newIndex) {

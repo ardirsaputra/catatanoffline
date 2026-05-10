@@ -29,7 +29,7 @@ class BerkasKuApp extends ConsumerWidget {
 
     return MaterialApp(
       title: 'BerkasKu',
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: true,
       localizationsDelegates: const [
         FlutterQuillLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

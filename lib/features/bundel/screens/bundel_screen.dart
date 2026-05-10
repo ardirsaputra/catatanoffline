@@ -28,7 +28,7 @@ class BundelScreen extends ConsumerWidget {
             iconTheme: const IconThemeData(color: Colors.white),
             actionsIconTheme: const IconThemeData(color: Colors.white),
             title: const Text(
-              'Bundel Kuesioner',
+              'Bundel Berkas',
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w700,
@@ -157,7 +157,7 @@ class BundelScreen extends ConsumerWidget {
       builder: (_) => AlertDialog(
         title: const Text('Tentang Bundel'),
         content: const Text(
-          'Bundel Kuesioner memungkinkan Anda menggabungkan beberapa berkas menjadi satu dokumen Word.\n\n'
+          'Bundel Berkas memungkinkan Anda menggabungkan beberapa berkas menjadi satu dokumen Word.\n\n'
           'Setiap berkas dalam bundel akan menjadi bab terpisah saat diekspor.',
         ),
         actions: [
@@ -311,7 +311,7 @@ class _CreateBundelSheet extends ConsumerStatefulWidget {
 }
 
 class _CreateBundelSheetState extends ConsumerState<_CreateBundelSheet> {
-  final _titleCtrl = TextEditingController(text: 'Bundel Baru');
+  final _titleCtrl = TextEditingController(text: '');
   final _descCtrl = TextEditingController();
   String _categoryId = '';
   final Set<String> _selectedBerkasIds = {};

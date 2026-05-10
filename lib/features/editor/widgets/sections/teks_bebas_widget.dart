@@ -7,8 +7,7 @@ class TeksBebasWidget extends StatefulWidget {
   final SectionModel section;
   final void Function(SectionModel) onChanged;
 
-  const TeksBebasWidget(
-      {super.key, required this.section, required this.onChanged});
+  const TeksBebasWidget({super.key, required this.section, required this.onChanged});
 
   @override
   State<TeksBebasWidget> createState() => _TeksBebasWidgetState();
@@ -18,7 +17,6 @@ class _TeksBebasWidgetState extends State<TeksBebasWidget> {
   late quill.QuillController _controller;
   final FocusNode _focusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
-  bool _expanded = false;
 
   @override
   void initState() {
@@ -31,8 +29,7 @@ class _TeksBebasWidgetState extends State<TeksBebasWidget> {
     final deltaJson = widget.section.data['deltaJson'] as String?;
     if (deltaJson != null && deltaJson.isNotEmpty) {
       try {
-        final doc =
-            quill.Document.fromJson(jsonDecode(deltaJson) as List);
+        final doc = quill.Document.fromJson(jsonDecode(deltaJson) as List);
         return quill.QuillController(
           document: doc,
           selection: const TextSelection.collapsed(offset: 0),
@@ -79,12 +76,12 @@ class _TeksBebasWidgetState extends State<TeksBebasWidget> {
               showBoldButton: true,
               showItalicButton: true,
               showUnderLineButton: true,
-              showStrikeThrough: true,
+              showStrikeThrough: false,
               showInlineCode: false,
               showColorButton: true,
               showBackgroundColorButton: false,
               showClearFormat: true,
-              showAlignmentButtons: false,
+              showAlignmentButtons: true,
               showHeaderStyle: true,
               showListNumbers: true,
               showListBullets: true,
@@ -99,13 +96,12 @@ class _TeksBebasWidgetState extends State<TeksBebasWidget> {
             ),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         // Editor
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          constraints: BoxConstraints(
-            minHeight: 120,
-            maxHeight: _expanded ? 600 : 240,
+        Container(
+          constraints: const BoxConstraints(
+            minHeight: 100,
+            maxHeight: 420,
           ),
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
@@ -119,30 +115,11 @@ class _TeksBebasWidgetState extends State<TeksBebasWidget> {
               scrollController: _scrollController,
               configurations: quill.QuillEditorConfigurations(
                 controller: _controller,
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 autoFocus: false,
                 expands: false,
                 scrollable: true,
-                placeholder: 'Tulis teks bebas di sini...',
               ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton.icon(
-            onPressed: () => setState(() => _expanded = !_expanded),
-            icon: Icon(
-              _expanded ? Icons.unfold_less : Icons.unfold_more,
-              size: 16,
-            ),
-            label: Text(
-              _expanded ? 'Perkecil' : 'Perbesar',
-              style: const TextStyle(fontSize: 12),
-            ),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             ),
           ),
         ),

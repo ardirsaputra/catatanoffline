@@ -22,12 +22,6 @@ class BerandaScreen extends ConsumerWidget {
     final thisWeekBerkas = allBerkas.where((b) => b.updatedAt.isAfter(now.subtract(const Duration(days: 7)))).length;
     final todayBerkas = allBerkas.where((b) => b.createdAt.year == now.year && b.createdAt.month == now.month && b.createdAt.day == now.day).length;
 
-    // Activity last 7 days: count berkas updated each day
-    final activityData = List.generate(7, (i) {
-      final day = now.subtract(Duration(days: 6 - i));
-      return allBerkas.where((b) => b.updatedAt.year == day.year && b.updatedAt.month == day.month && b.updatedAt.day == day.day).length;
-    });
-
     final greeting = _greeting(now.hour);
 
     return Scaffold(
@@ -97,17 +91,22 @@ class BerandaScreen extends ConsumerWidget {
             ),
           ),
 
-          // ── Activity sparkline ─────────────────────────────────
-          if (allBerkas.isNotEmpty)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
-                child: _ActivitySparkline(
-                  activityData: activityData,
-                  colorScheme: colorScheme,
+          // ── Activity heatmap ─────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+              child: _ActivityHeatmap(
+                allBerkas: allBerkas,
+                colorScheme: colorScheme,
+                onDateTap: (date) => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => BerkasListScreen(filterDate: date),
+                  ),
                 ),
               ),
             ),
+          ),
 
           // ── Quick actions ──────────────────────────────────────
           SliverToBoxAdapter(
@@ -240,7 +239,7 @@ class BerandaScreen extends ConsumerWidget {
       floating: false,
       pinned: true,
       title: const Text(
-        'BerkasKu offline',
+        'BerkasKu',
         style: TextStyle(
           fontFamily: 'Poppins',
           fontWeight: FontWeight.w700,
@@ -441,116 +440,205 @@ class _InsightCard extends StatelessWidget {
   }
 }
 
-// ── Activity Sparkline ──────────────────────────────────────────────────────
+// ── Activity Heatmap (GitHub style) ────────────────────────────────────────
 
-class _ActivitySparkline extends StatelessWidget {
-  final List<int> activityData;
+class _ActivityHeatmap extends StatelessWidget {
+  final List<BerkasModel> allBerkas;
   final ColorScheme colorScheme;
+  final void Function(DateTime) onDateTap;
 
-  const _ActivitySparkline({required this.activityData, required this.colorScheme});
+  const _ActivityHeatmap({
+    required this.allBerkas,
+    required this.colorScheme,
+    required this.onDateTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final dayLabels = List.generate(7, (i) {
-      final d = now.subtract(Duration(days: 6 - i));
-      const names = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
-      return names[d.weekday - 1];
-    });
-    final maxVal = activityData.reduce((a, b) => a > b ? a : b);
+    const weeks = 18;
+    final today = DateTime.now();
+    final todayNorm = DateTime(today.year, today.month, today.day);
+
+    // Start from the Sunday of the week 17 weeks ago
+    final daysSinceSunday = today.weekday % 7;
+    final lastSunday = todayNorm.subtract(Duration(days: daysSinceSunday));
+    final startDate = lastSunday.subtract(const Duration(days: (weeks - 1) * 7));
+
+    // Build activity map
+    final activityMap = <String, int>{};
+    for (final b in allBerkas) {
+      final d = b.updatedAt;
+      final key = '${d.year}-${d.month}-${d.day}';
+      activityMap[key] = (activityMap[key] ?? 0) + 1;
+    }
+
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    final dayLabels = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+    // Build week columns (Sun=0 … Sat=6)
+    final weekColumns = <List<DateTime?>>[];
+    for (var w = 0; w < weeks; w++) {
+      final col = <DateTime?>[];
+      for (var d = 0; d < 7; d++) {
+        final date = startDate.add(Duration(days: w * 7 + d));
+        col.add(date.isAfter(todayNorm) ? null : date);
+      }
+      weekColumns.add(col);
+    }
+
+    // Month labels for top row
+    final monthLabels = <int, String>{};
+    for (var w = 0; w < weekColumns.length; w++) {
+      for (final date in weekColumns[w]) {
+        if (date != null && date.day <= 7) {
+          monthLabels[w] = months[date.month - 1];
+          break;
+        }
+      }
+    }
+
+    Color cellColor(int count) {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      if (count == 0) return isDark ? const Color(0xFF2D2D2D) : const Color(0xFFEAECEF);
+      if (count == 1) return const Color(0xFF9BE9A8);
+      if (count <= 3) return const Color(0xFF40C463);
+      if (count <= 6) return const Color(0xFF30A14E);
+      return const Color(0xFF216E39);
+    }
+
+    const cellSize = 13.0;
+    const cellGap = 2.5;
+
+    // Total activity for header
+    final totalActivity = activityMap.values.fold(0, (a, b) => a + b);
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color ?? Colors.white,
+        color: Theme.of(context).cardTheme.color ?? colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.bar_chart_rounded, size: 18, color: Color(0xFF6C63FF)),
+              const Text('🔥', style: TextStyle(fontSize: 14)),
               const SizedBox(width: 6),
-              Text(
-                'Aktivitas 7 Hari Terakhir',
-                style: const TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF3D3D3D),
+              Expanded(
+                child: Text(
+                  'Riwayat Aktivitas',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF216E39).withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$totalActivity total',
+                  style: const TextStyle(fontFamily: 'Poppins', fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF216E39)),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 56,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: List.generate(7, (i) {
-                final val = activityData[i];
-                final frac = maxVal == 0 ? 0.0 : val / maxVal;
-                final isToday = i == 6;
-                return Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
+          const SizedBox(height: 2),
+          Text(
+            'Ketuk tanggal untuk melihat berkas hari itu',
+            style: TextStyle(fontFamily: 'Poppins', fontSize: 10, color: colorScheme.onSurfaceVariant),
+          ),
+          const SizedBox(height: 10),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Month labels
+                SizedBox(
+                  height: 13,
+                  child: Row(
                     children: [
-                      if (val > 0)
-                        Text(
-                          '$val',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                            color: isToday ? const Color(0xFF6C63FF) : const Color(0xFF9E9E9E),
-                          ),
+                      const SizedBox(width: 26),
+                      for (var w = 0; w < weeks; w++)
+                        SizedBox(
+                          width: cellSize + cellGap,
+                          child: monthLabels.containsKey(w) ? Text(monthLabels[w]!, style: TextStyle(fontFamily: 'Poppins', fontSize: 8, color: colorScheme.onSurfaceVariant)) : null,
                         ),
-                      const SizedBox(height: 2),
-                      Flexible(
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 3),
-                          height: maxVal == 0 ? 4 : (40 * frac).clamp(4, 40),
-                          decoration: BoxDecoration(
-                            gradient: isToday
-                                ? const LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [Color(0xFF6C63FF), Color(0xFF957FEF)],
-                                  )
-                                : LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      const Color(0xFF9E9E9E).withOpacity(0.5),
-                                      const Color(0xFF9E9E9E).withOpacity(0.3),
-                                    ],
-                                  ),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        dayLabels[i],
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 9,
-                          fontWeight: isToday ? FontWeight.w700 : FontWeight.w400,
-                          color: isToday ? const Color(0xFF6C63FF) : const Color(0xFF9E9E9E),
-                        ),
-                      ),
                     ],
                   ),
-                );
-              }),
+                ),
+                const SizedBox(height: 3),
+                // Grid rows (Sun..Sat)
+                for (var d = 0; d < 7; d++)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: cellGap),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 26,
+                          child: d % 2 == 1
+                              ? Text(
+                                  dayLabels[d],
+                                  style: TextStyle(fontFamily: 'Poppins', fontSize: 8, color: colorScheme.onSurfaceVariant),
+                                )
+                              : null,
+                        ),
+                        for (var w = 0; w < weeks; w++) ...[
+                          Builder(builder: (ctx) {
+                            final date = weekColumns[w][d];
+                            if (date == null) {
+                              return SizedBox(width: cellSize + cellGap, height: cellSize);
+                            }
+                            final key = '${date.year}-${date.month}-${date.day}';
+                            final count = activityMap[key] ?? 0;
+                            final isToday = date.year == todayNorm.year && date.month == todayNorm.month && date.day == todayNorm.day;
+                            return Tooltip(
+                              message: count == 0 ? '${date.day} ${months[date.month - 1]} — tidak ada aktivitas' : '${date.day} ${months[date.month - 1]} — $count berkas',
+                              child: GestureDetector(
+                                onTap: count > 0 ? () => onDateTap(date) : null,
+                                child: Container(
+                                  width: cellSize,
+                                  height: cellSize,
+                                  margin: const EdgeInsets.only(right: cellGap),
+                                  decoration: BoxDecoration(
+                                    color: cellColor(count),
+                                    borderRadius: BorderRadius.circular(2),
+                                    border: isToday ? Border.all(color: colorScheme.primary, width: 1.5) : null,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
+                      ],
+                    ),
+                  ),
+                // Legend
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const SizedBox(width: 26),
+                    Text('Tidak ada', style: TextStyle(fontFamily: 'Poppins', fontSize: 8, color: colorScheme.onSurfaceVariant)),
+                    const SizedBox(width: 4),
+                    for (final c in [const Color(0xFF9BE9A8), const Color(0xFF40C463), const Color(0xFF30A14E), const Color(0xFF216E39)])
+                      Container(
+                        width: 11,
+                        height: 11,
+                        margin: const EdgeInsets.only(right: 2),
+                        decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(2)),
+                      ),
+                    Text('Banyak', style: TextStyle(fontFamily: 'Poppins', fontSize: 8, color: colorScheme.onSurfaceVariant)),
+                  ],
+                ),
+              ],
             ),
           ),
         ],

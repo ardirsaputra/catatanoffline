@@ -7,8 +7,7 @@ final berkasRepositoryProvider = Provider<BerkasRepository>(
   (_) => BerkasRepository(),
 );
 
-final berkasProvider =
-    StateNotifierProvider<BerkasNotifier, List<BerkasModel>>((ref) {
+final berkasProvider = StateNotifierProvider<BerkasNotifier, List<BerkasModel>>((ref) {
   return BerkasNotifier(ref.read(berkasRepositoryProvider));
 });
 
@@ -16,15 +15,20 @@ final berkasProvider =
 final berkasSearchQueryProvider = StateProvider<String>((_) => '');
 final berkasSelectedCategoryProvider = StateProvider<String?>((_) => null);
 
+// Date filter state (set when navigating from activity heatmap)
+final berkasFilterDateProvider = StateProvider<DateTime?>((_) => null);
+
 // Filtered berkas
 final filteredBerkasProvider = Provider<List<BerkasModel>>((ref) {
   final all = ref.watch(berkasProvider);
   final query = ref.watch(berkasSearchQueryProvider).toLowerCase();
   final cat = ref.watch(berkasSelectedCategoryProvider);
+  final filterDate = ref.watch(berkasFilterDateProvider);
   return all.where((b) {
     final matchesQuery = query.isEmpty || b.title.toLowerCase().contains(query);
     final matchesCat = cat == null || b.categoryId == cat;
-    return matchesQuery && matchesCat;
+    final matchesDate = filterDate == null || (b.updatedAt.year == filterDate.year && b.updatedAt.month == filterDate.month && b.updatedAt.day == filterDate.day);
+    return matchesQuery && matchesCat && matchesDate;
   }).toList();
 });
 
@@ -68,8 +72,7 @@ class BerkasNotifier extends StateNotifier<List<BerkasModel>> {
   Future<void> update(BerkasModel berkas) async {
     final updated = berkas.copyWith(updatedAt: DateTime.now());
     await _repository.save(updated);
-    state = state.map((b) => b.id == berkas.id ? updated : b).toList()
-      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    state = state.map((b) => b.id == berkas.id ? updated : b).toList()..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
   }
 
   Future<void> delete(String id) async {

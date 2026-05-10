@@ -6,6 +6,7 @@ import '../../../app/theme/color_schemes.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../features/auth/services/biometric_service.dart';
 import '../../../features/auth/widgets/pin_pad_widget.dart';
+import '../../../features/backup/screens/backup_screen.dart';
 import '../../../features/berkas/providers/category_provider.dart';
 import '../../../shared/models/category_model.dart';
 import '../../../shared/models/settings_model.dart';
@@ -181,6 +182,30 @@ class SettingsScreen extends ConsumerWidget {
               // ── Kategori ─────────────────────────────────────────────────
               _SectionHeader(title: 'Kategori', icon: '🗂️'),
               _CategoryManagerTile(ref: ref),
+
+              const Divider(height: 16),
+
+              // ── Cadangan & Migrasi ────────────────────────────────────────
+              _SectionHeader(title: 'Cadangan & Migrasi', icon: '🔐'),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4CAF50).withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.import_export_rounded, color: Color(0xFF4CAF50), size: 20),
+                ),
+                dense: true,
+                visualDensity: VisualDensity.compact,
+                title: const Text('Export & Import Data', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w500, fontSize: 13)),
+                subtitle: const Text('Transfer data ke perangkat lain dengan enkripsi PIN', style: TextStyle(fontFamily: 'Poppins', fontSize: 11)),
+                trailing: Icon(Icons.arrow_forward_ios, size: 12, color: colorScheme.outline),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const BackupScreen()),
+                ),
+              ),
 
               const SizedBox(height: 24),
             ]),
@@ -416,8 +441,8 @@ class _CategoryManagerTile extends ConsumerWidget {
       children: [
         ...categories.map((cat) => ListTile(
               leading: Container(
-                width: 36,
-                height: 36,
+                width: 30,
+                height: 30,
                 decoration: BoxDecoration(
                   color: _colorFromHex(cat.colorHex).withOpacity(0.3),
                   shape: BoxShape.circle,
@@ -426,7 +451,7 @@ class _CategoryManagerTile extends ConsumerWidget {
                   child: Text(cat.iconName, style: const TextStyle(fontSize: 16)),
                 ),
               ),
-              title: Text(cat.name, style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w500)),
+              title: Text(cat.name, style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w500, fontSize: 13)),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -443,15 +468,15 @@ class _CategoryManagerTile extends ConsumerWidget {
             )),
         ListTile(
           leading: Container(
-            width: 36,
-            height: 36,
+            width: 30,
+            height: 30,
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.primaryContainer,
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.add, size: 20),
           ),
-          title: Text('Tambah Kategori', style: TextStyle(fontFamily: 'Poppins', color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600)),
+          title: Text('Tambah Kategori', style: TextStyle(fontFamily: 'Poppins', color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600, fontSize: 13)),
           onTap: () => _showCategoryForm(context, watchRef, null),
         ),
       ],
