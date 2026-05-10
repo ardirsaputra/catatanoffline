@@ -13,14 +13,14 @@ class TemplatePickerSheet extends ConsumerStatefulWidget {
     return showModalBottomSheet<TemplateModel>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (_) => const TemplatePickerSheet(),
     );
   }
 
   @override
-  ConsumerState<TemplatePickerSheet> createState() =>
-      _TemplatePickerSheetState();
+  ConsumerState<TemplatePickerSheet> createState() => _TemplatePickerSheetState();
 }
 
 class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
@@ -38,8 +38,7 @@ class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
       builder: (_, scrollController) => Container(
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           children: [
@@ -60,8 +59,7 @@ class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
 
             // Header
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Row(
                 children: [
                   Expanded(
@@ -70,14 +68,16 @@ class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
                       children: [
                         Text(
                           'Pilih Template',
-                          style: TextStyle(fontFamily: 'Poppins', 
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         Text(
                           'Pilih template sebagai titik awal berkas Anda',
-                          style: TextStyle(fontFamily: 'Poppins', 
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
                             fontSize: 12,
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -87,8 +87,7 @@ class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
                   ),
                   if (_selectedTemplate != null)
                     FilledButton(
-                      onPressed: () =>
-                          Navigator.pop(context, _selectedTemplate),
+                      onPressed: () => Navigator.pop(context, _selectedTemplate),
                       child: const Text('Gunakan'),
                     ),
                 ],
@@ -115,8 +114,7 @@ class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
                         return _TemplateListTile(
                           template: tmpl,
                           selected: selected,
-                          onTap: () =>
-                              setState(() => _selectedTemplate = tmpl),
+                          onTap: () => setState(() => _selectedTemplate = tmpl),
                           onUse: () => Navigator.pop(context, tmpl),
                         );
                       },
@@ -127,9 +125,7 @@ class _TemplatePickerSheetState extends ConsumerState<TemplatePickerSheet> {
 
                   // Preview
                   Expanded(
-                    child: _selectedTemplate == null
-                        ? _EmptyPreview()
-                        : _TemplatePreview(template: _selectedTemplate!),
+                    child: _selectedTemplate == null ? _EmptyPreview() : _TemplatePreview(template: _selectedTemplate!),
                   ),
                 ],
               ),
@@ -167,10 +163,7 @@ class _TemplateListTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: selected ? colorScheme.primaryContainer.withOpacity(0.4) : null,
-          border: selected
-              ? Border(
-                  left: BorderSide(color: colorScheme.primary, width: 3))
-              : null,
+          border: selected ? Border(left: BorderSide(color: colorScheme.primary, width: 3)) : null,
         ),
         child: Row(
           children: [
@@ -185,7 +178,8 @@ class _TemplateListTile extends StatelessWidget {
                 children: [
                   Text(
                     template.name,
-                    style: TextStyle(fontFamily: 'Poppins', 
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
                       fontSize: 12,
                       fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                       color: selected ? colorScheme.primary : null,
@@ -196,7 +190,8 @@ class _TemplateListTile extends StatelessWidget {
                   if (template.isBuiltIn)
                     Text(
                       'Bawaan',
-                      style: TextStyle(fontFamily: 'Poppins', 
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
                         fontSize: 9,
                         color: colorScheme.secondary,
                         fontWeight: FontWeight.w600,
@@ -240,7 +235,8 @@ class _TemplatePreview extends StatelessWidget {
                   children: [
                     Text(
                       template.name,
-                      style: TextStyle(fontFamily: 'Poppins', 
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -248,7 +244,8 @@ class _TemplatePreview extends StatelessWidget {
                     if (template.description.isNotEmpty)
                       Text(
                         template.description,
-                        style: TextStyle(fontFamily: 'Poppins', 
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
                           fontSize: 12,
                           color: colorScheme.onSurfaceVariant,
                         ),
@@ -269,7 +266,8 @@ class _TemplatePreview extends StatelessWidget {
             ),
             child: Text(
               '${template.sectionsData.length} bagian',
-              style: TextStyle(fontFamily: 'Poppins', 
+              style: TextStyle(
+                fontFamily: 'Poppins',
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: colorScheme.primary,
@@ -281,7 +279,8 @@ class _TemplatePreview extends StatelessWidget {
           if (template.sectionsData.isEmpty)
             Text(
               'Template kosong — mulai dari awal',
-              style: TextStyle(fontFamily: 'Poppins', 
+              style: TextStyle(
+                fontFamily: 'Poppins',
                 fontSize: 13,
                 color: colorScheme.onSurfaceVariant,
                 fontStyle: FontStyle.italic,
@@ -290,7 +289,8 @@ class _TemplatePreview extends StatelessWidget {
           else ...[
             Text(
               'Bagian dalam template:',
-              style: TextStyle(fontFamily: 'Poppins', 
+              style: TextStyle(
+                fontFamily: 'Poppins',
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
@@ -318,7 +318,8 @@ class _TemplatePreview extends StatelessWidget {
                       child: Center(
                         child: Text(
                           '${idx + 1}',
-                          style: TextStyle(fontFamily: 'Poppins', 
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                             color: colorScheme.secondary,
@@ -327,8 +328,7 @@ class _TemplatePreview extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    Text(sectionType.icon,
-                        style: const TextStyle(fontSize: 16)),
+                    Text(sectionType.icon, style: const TextStyle(fontSize: 16)),
                     const SizedBox(width: 8),
                     Text(
                       sectionType.label,
@@ -367,7 +367,8 @@ class _EmptyPreview extends StatelessWidget {
           Text(
             'Pilih template\nuntuk melihat pratinjau',
             textAlign: TextAlign.center,
-            style: TextStyle(fontFamily: 'Poppins', 
+            style: TextStyle(
+              fontFamily: 'Poppins',
               color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 13,
               height: 1.6,

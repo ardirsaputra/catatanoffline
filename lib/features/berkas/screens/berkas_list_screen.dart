@@ -282,6 +282,7 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _CreateBerkasSheet(
         preselectedTemplateId: preselectedTemplateId,
@@ -931,162 +932,164 @@ class _CreateBerkasSheetState extends ConsumerState<_CreateBerkasSheet> {
         20,
         MediaQuery.of(context).viewInsets.bottom + 20,
       ),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: colorScheme.outline,
-                  borderRadius: BorderRadius.circular(2),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colorScheme.outline,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Buat Berkas Baru',
-              style: TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 20),
-
-            // Title
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Judul Berkas',
-                prefixIcon: Icon(Icons.title),
+              const SizedBox(height: 20),
+              Text(
+                'Buat Berkas Baru',
+                style: TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w700),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-            // Category
-            if (categories.isNotEmpty)
-              DropdownButtonFormField<String>(
-                value: _selectedCategoryId.isEmpty ? null : _selectedCategoryId,
+              // Title
+              TextField(
+                controller: _titleController,
                 decoration: const InputDecoration(
-                  labelText: 'Kategori',
-                  prefixIcon: Icon(Icons.category_outlined),
+                  labelText: 'Judul Berkas',
+                  prefixIcon: Icon(Icons.title),
                 ),
-                items: categories
-                    .map((c) => DropdownMenuItem(
-                          value: c.id,
-                          child: Text('${c.iconName} ${c.name}'),
-                        ))
-                    .toList(),
-                onChanged: (v) => setState(() => _selectedCategoryId = v ?? ''),
               ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // Icon picker
-            Text('Ikon', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 48,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: AppConstants.cardIcons
-                    .map((icon) => GestureDetector(
-                          onTap: () => setState(() => _selectedIcon = icon),
-                          child: Container(
-                            width: 44,
-                            height: 44,
-                            margin: const EdgeInsets.only(right: 8),
-                            decoration: BoxDecoration(
-                              color: _selectedIcon == icon ? colorScheme.primary.withOpacity(0.3) : colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(10),
-                              border: _selectedIcon == icon ? Border.all(color: colorScheme.primary, width: 2) : null,
+              // Category
+              if (categories.isNotEmpty)
+                DropdownButtonFormField<String>(
+                  value: _selectedCategoryId.isEmpty ? null : _selectedCategoryId,
+                  decoration: const InputDecoration(
+                    labelText: 'Kategori',
+                    prefixIcon: Icon(Icons.category_outlined),
+                  ),
+                  items: categories
+                      .map((c) => DropdownMenuItem(
+                            value: c.id,
+                            child: Text('${c.iconName} ${c.name}'),
+                          ))
+                      .toList(),
+                  onChanged: (v) => setState(() => _selectedCategoryId = v ?? ''),
+                ),
+              const SizedBox(height: 16),
+
+              // Icon picker
+              Text('Ikon', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 48,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: AppConstants.cardIcons
+                      .map((icon) => GestureDetector(
+                            onTap: () => setState(() => _selectedIcon = icon),
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                color: _selectedIcon == icon ? colorScheme.primary.withOpacity(0.3) : colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(10),
+                                border: _selectedIcon == icon ? Border.all(color: colorScheme.primary, width: 2) : null,
+                              ),
+                              child: Center(
+                                child: Text(icon, style: const TextStyle(fontSize: 20)),
+                              ),
                             ),
-                            child: Center(
-                              child: Text(icon, style: const TextStyle(fontSize: 20)),
-                            ),
-                          ),
-                        ))
-                    .toList(),
+                          ))
+                      .toList(),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // Color tag
-            Text('Warna Tag', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 36,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: AppConstants.colorTags.map((color) {
-                  final c = Color(int.parse('FF${color.replaceFirst('#', '')}', radix: 16));
-                  return GestureDetector(
-                    onTap: () => setState(() => _selectedColor = color),
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      margin: const EdgeInsets.only(right: 8),
-                      decoration: BoxDecoration(
-                        color: c,
-                        shape: BoxShape.circle,
-                        border: _selectedColor == color ? Border.all(color: Colors.black38, width: 2.5) : Border.all(color: Colors.black12, width: 1),
+              // Color tag
+              Text('Warna Tag', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 36,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: AppConstants.colorTags.map((color) {
+                    final c = Color(int.parse('FF${color.replaceFirst('#', '')}', radix: 16));
+                    return GestureDetector(
+                      onTap: () => setState(() => _selectedColor = color),
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        margin: const EdgeInsets.only(right: 8),
+                        decoration: BoxDecoration(
+                          color: c,
+                          shape: BoxShape.circle,
+                          border: _selectedColor == color ? Border.all(color: Colors.black38, width: 2.5) : Border.all(color: Colors.black12, width: 1),
+                        ),
                       ),
-                    ),
-                  );
-                }).toList(),
+                    );
+                  }).toList(),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            // Template picker
-            Text('Template', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 90,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: templates
-                    .map((tmpl) => GestureDetector(
-                          onTap: () => setState(() {
-                            _selectedTemplate = tmpl;
-                            _titleController.text = tmpl.name;
-                          }),
-                          child: Container(
-                            width: 110,
-                            margin: const EdgeInsets.only(right: 10),
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: _selectedTemplate?.id == tmpl.id ? colorScheme.primary.withOpacity(0.2) : colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(12),
-                              border: _selectedTemplate?.id == tmpl.id ? Border.all(color: colorScheme.primary, width: 2) : null,
+              // Template picker
+              Text('Template', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 90,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: templates
+                      .map((tmpl) => GestureDetector(
+                            onTap: () => setState(() {
+                              _selectedTemplate = tmpl;
+                              _titleController.text = tmpl.name;
+                            }),
+                            child: Container(
+                              width: 110,
+                              margin: const EdgeInsets.only(right: 10),
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: _selectedTemplate?.id == tmpl.id ? colorScheme.primary.withOpacity(0.2) : colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(12),
+                                border: _selectedTemplate?.id == tmpl.id ? Border.all(color: colorScheme.primary, width: 2) : null,
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(tmpl.iconEmoji, style: const TextStyle(fontSize: 24)),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    tmpl.name,
+                                    style: TextStyle(fontFamily: 'Poppins', fontSize: 10, fontWeight: FontWeight.w500),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
                             ),
-                            child: Column(
-                              children: [
-                                Text(tmpl.iconEmoji, style: const TextStyle(fontSize: 24)),
-                                const SizedBox(height: 4),
-                                Text(
-                                  tmpl.name,
-                                  style: TextStyle(fontFamily: 'Poppins', fontSize: 10, fontWeight: FontWeight.w500),
-                                  textAlign: TextAlign.center,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ))
-                    .toList(),
+                          ))
+                      .toList(),
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _create,
-                child: const Text('Buat Berkas'),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _create,
+                  child: const Text('Buat Berkas'),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -23,6 +23,9 @@ void main() async {
   await initializeDateFormatting('id_ID', null);
   await HiveService.init();
 
+  // Initialise home widget (must be done before any widget operations).
+  await WidgetService.init();
+
   // Record first-launch time for trial
   final authBox = Hive.box<String>('auth');
   if (!authBox.containsKey('trial_start')) {

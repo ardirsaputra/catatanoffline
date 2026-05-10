@@ -32,6 +32,11 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:scheme="berkaskyu" android:host="add_note"/>
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="berkaskyu" android:host="open_list"/>
+            </intent-filter>
         </activity>
         <!-- Home widget provider -->
         <receiver

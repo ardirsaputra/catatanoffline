@@ -174,6 +174,7 @@ class BundelScreen extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _CreateBundelSheet(
         onCreated: (bundle) {
@@ -345,73 +346,75 @@ class _CreateBundelSheetState extends ConsumerState<_CreateBundelSheet> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.fromLTRB(20, 16, 20, MediaQuery.of(context).viewInsets.bottom + 20),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Buat Bundel Baru', style: TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _titleCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Judul Bundel',
-                prefixIcon: Icon(Icons.title),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _descCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Deskripsi (opsional)',
-                prefixIcon: Icon(Icons.description_outlined),
-              ),
-            ),
-            const SizedBox(height: 12),
-            if (categories.isNotEmpty)
-              DropdownButtonFormField<String>(
-                value: _categoryId.isEmpty ? null : _categoryId,
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Buat Bundel Baru', style: TextStyle(fontFamily: 'Poppins', fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _titleCtrl,
                 decoration: const InputDecoration(
-                  labelText: 'Kategori',
-                  prefixIcon: Icon(Icons.category_outlined),
+                  labelText: 'Judul Bundel',
+                  prefixIcon: Icon(Icons.title),
                 ),
-                items: categories
-                    .map((c) => DropdownMenuItem(
-                          value: c.id,
-                          child: Text('${c.iconName} ${c.name}'),
-                        ))
-                    .toList(),
-                onChanged: (v) => setState(() => _categoryId = v ?? ''),
+              ),       
+              const SizedBox(height: 12),
+              TextField(
+                controller: _descCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Deskripsi (opsional)',
+                  prefixIcon: Icon(Icons.description_outlined),
+                ),
               ),
-            const SizedBox(height: 20),
-            Text('Pilih Berkas', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            ...allBerkas.map((berkas) => CheckboxListTile(
-                  title: Text(berkas.title),
-                  subtitle: Text('${berkas.sections.length} bagian'),
-                  value: _selectedBerkasIds.contains(berkas.id),
-                  onChanged: (v) {
-                    setState(() {
-                      if (v == true) {
-                        _selectedBerkasIds.add(berkas.id);
-                      } else {
-                        _selectedBerkasIds.remove(berkas.id);
-                      }
-                    });
-                  },
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                )),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _create,
-                child: const Text('Buat Bundel'),
+              const SizedBox(height: 12),
+              if (categories.isNotEmpty)
+                DropdownButtonFormField<String>(
+                  value: _categoryId.isEmpty ? null : _categoryId,
+                  decoration: const InputDecoration(
+                    labelText: 'Kategori',
+                    prefixIcon: Icon(Icons.category_outlined),
+                  ),
+                  items: categories
+                      .map((c) => DropdownMenuItem(
+                            value: c.id,
+                            child: Text('${c.iconName} ${c.name}'),
+                          ))
+                      .toList(),
+                  onChanged: (v) => setState(() => _categoryId = v ?? ''),
+                ),
+              const SizedBox(height: 20),
+              Text('Pilih Berkas', style: TextStyle(fontFamily: 'Poppins', fontSize: 13, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              ...allBerkas.map((berkas) => CheckboxListTile(
+                    title: Text(berkas.title),
+                    subtitle: Text('${berkas.sections.length} bagian'),
+                    value: _selectedBerkasIds.contains(berkas.id),
+                    onChanged: (v) {
+                      setState(() {
+                        if (v == true) {
+                          _selectedBerkasIds.add(berkas.id);
+                        } else {
+                          _selectedBerkasIds.remove(berkas.id);
+                        }
+                      });
+                    },
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  )),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _create,
+                  child: const Text('Buat Bundel'),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

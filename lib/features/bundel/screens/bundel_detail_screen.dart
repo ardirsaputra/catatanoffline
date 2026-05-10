@@ -186,6 +186,7 @@ class BundelDetailScreen extends ConsumerWidget {
     }
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       builder: (_) => Column(
         children: [
           Padding(

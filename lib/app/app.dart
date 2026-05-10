@@ -139,7 +139,9 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> with WidgetsBinding
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _updateWidget();
+    if (state == AppLifecycleState.resumed || state == AppLifecycleState.paused) {
+      _updateWidget();
+    }
   }
 
   void _updateWidget() {
@@ -148,14 +150,18 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> with WidgetsBinding
 
   void _handlePendingWidgetAction() {
     final action = ref.read(pendingWidgetActionProvider);
-    if (action == 'add_note' && mounted) {
-      ref.read(pendingWidgetActionProvider.notifier).state = null;
+    if (action == null || !mounted) return;
+    ref.read(pendingWidgetActionProvider.notifier).state = null;
+
+    if (action == 'add_note') {
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => const BerkasListScreen(openCreateDialog: true),
         ),
       );
+    } else if (action == 'open_list') {
+      ref.read(_selectedTabProvider.notifier).state = 1;
     }
   }
 

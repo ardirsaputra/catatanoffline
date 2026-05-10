@@ -320,6 +320,7 @@ class _ChoiceTile extends StatelessWidget {
       onTap: () {
         showModalBottomSheet(
           context: context,
+          useSafeArea: true,
           builder: (_) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -499,6 +500,7 @@ class _CategoryManagerTile extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       builder: (_) => _CategoryForm(
         existing: existing,
         onSave: (name, icon, color) async {
@@ -763,6 +765,7 @@ class _LockModeTileState extends ConsumerState<_LockModeTile> {
     return showModalBottomSheet<String?>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (_) => const _PinSetupSheet(),
     );
@@ -781,6 +784,7 @@ class _LockModeTileState extends ConsumerState<_LockModeTile> {
           ? null
           : () => showModalBottomSheet(
                 context: context,
+                useSafeArea: true,
                 builder: (_) => Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -824,6 +828,7 @@ class _PinSetupTile extends StatelessWidget {
         final pin = await showModalBottomSheet<String?>(
           context: context,
           isScrollControlled: true,
+          useSafeArea: true,
           backgroundColor: Colors.transparent,
           builder: (_) => const _PinSetupSheet(),
         );

@@ -203,6 +203,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   void _showAddSection() {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       builder: (_) => AddSectionSheet(
         onSelected: (type) {
           Navigator.pop(context);
@@ -216,6 +217,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       builder: (_) => BackgroundPickerSheet(
         currentType: berkas.backgroundType,
         currentValue: berkas.backgroundValue,

@@ -10,8 +10,7 @@ class GambarWidget extends StatefulWidget {
   final SectionModel section;
   final void Function(SectionModel) onChanged;
 
-  const GambarWidget(
-      {super.key, required this.section, required this.onChanged});
+  const GambarWidget({super.key, required this.section, required this.onChanged});
 
   @override
   State<GambarWidget> createState() => _GambarWidgetState();
@@ -27,8 +26,7 @@ class _GambarWidgetState extends State<GambarWidget> {
   void initState() {
     super.initState();
     _imagePath = widget.section.data['imagePath'] as String?;
-    _captionCtrl = TextEditingController(
-        text: widget.section.data['caption'] as String? ?? '');
+    _captionCtrl = TextEditingController(text: widget.section.data['caption'] as String? ?? '');
   }
 
   @override
@@ -116,11 +114,8 @@ class _GambarWidgetState extends State<GambarWidget> {
                   ),
                   TextButton.icon(
                     onPressed: _removeImage,
-                    icon: Icon(Icons.delete_outline,
-                        size: 16, color: colorScheme.error),
-                    label: Text('Hapus',
-                        style:
-                            TextStyle(color: colorScheme.error)),
+                    icon: Icon(Icons.delete_outline, size: 16, color: colorScheme.error),
+                    label: Text('Hapus', style: TextStyle(color: colorScheme.error)),
                   ),
                 ],
               ),
@@ -132,23 +127,20 @@ class _GambarWidgetState extends State<GambarWidget> {
             child: Container(
               height: 140,
               decoration: BoxDecoration(
-                color:
-                    colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                    color: colorScheme.outline,
-                    style: BorderStyle.solid),
+                border: Border.all(color: colorScheme.outline, style: BorderStyle.solid),
               ),
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.add_photo_alternate_outlined,
-                        size: 40, color: colorScheme.onSurfaceVariant),
+                    Icon(Icons.add_photo_alternate_outlined, size: 40, color: colorScheme.onSurfaceVariant),
                     const SizedBox(height: 8),
                     Text(
                       'Ketuk untuk menambah gambar',
-                      style: TextStyle(fontFamily: 'Poppins', 
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 13,
                       ),
@@ -175,6 +167,7 @@ class _GambarWidgetState extends State<GambarWidget> {
   void _showPickDialog() {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       builder: (_) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,

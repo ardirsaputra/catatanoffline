@@ -62,7 +62,7 @@ class BerandaScreen extends ConsumerWidget {
                         child: _InsightCard(
                           icon: Icons.today_rounded,
                           value: '$todayBerkas',
-                          label: 'Dibuat Hari Ini',
+                          label: 'Hari Ini',
                           color: const Color(0xFFFF6584),
                         ),
                       ),
