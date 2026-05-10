@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'data/local/hive_service.dart';
 import 'features/widget/widget_service.dart';
 import 'app/app.dart';
@@ -21,6 +22,12 @@ void main() async {
 
   await initializeDateFormatting('id_ID', null);
   await HiveService.init();
+
+  // Record first-launch time for trial
+  final authBox = Hive.box<String>('auth');
+  if (!authBox.containsKey('trial_start')) {
+    await authBox.put('trial_start', DateTime.now().toIso8601String());
+  }
 
   // Handle cold-start launch from home widget
   final initialUri = await HomeWidget.initiallyLaunchedFromHomeWidget();

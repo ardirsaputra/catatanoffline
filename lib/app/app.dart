@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/translations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../app/theme/app_theme.dart';
 import '../app/theme/color_schemes.dart';
 import '../features/settings/providers/settings_provider.dart';
@@ -47,8 +48,30 @@ class BerkasKuApp extends ConsumerWidget {
         fontSize: settings.fontSize,
       ),
       themeMode: settings.darkMode ? ThemeMode.dark : ThemeMode.light,
-      home: const _AuthGate(),
+      home: const _TrialGate(),
     );
+  }
+}
+
+/// Blocks the app silently when the 7-day trial has expired.
+class _TrialGate extends StatelessWidget {
+  const _TrialGate();
+
+  bool get _isExpired {
+    final box = Hive.box<String>('auth');
+    final raw = box.get('trial_start');
+    if (raw == null) return false;
+    final start = DateTime.tryParse(raw);
+    if (start == null) return false;
+    return DateTime.now().difference(start).inDays >= 14;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isExpired) {
+      return const Scaffold(backgroundColor: Colors.black);
+    }
+    return const _AuthGate();
   }
 }
 
