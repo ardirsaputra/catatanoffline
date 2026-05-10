@@ -46,6 +46,10 @@ class CategoryNotifier extends StateNotifier<List<CategoryModel>> {
     state = state.where((c) => c.id != id).toList();
   }
 
+  void refresh() {
+    state = _repository.getAll();
+  }
+
   CategoryModel? getById(String id) {
     try {
       return state.firstWhere((c) => c.id == id);

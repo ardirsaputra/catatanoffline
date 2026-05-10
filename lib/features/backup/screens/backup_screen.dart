@@ -3,10 +3,13 @@ import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../backup_service.dart';
+import '../../berkas/providers/berkas_provider.dart';
+import '../../berkas/providers/category_provider.dart';
 
 class BackupScreen extends StatelessWidget {
   const BackupScreen({super.key});
@@ -67,7 +70,7 @@ class BackupScreen extends StatelessWidget {
           _ActionCard(
             icon: Icons.file_download_outlined,
             title: 'Buat File Backup',
-            subtitle: 'Simpan semua berkas & kategori ke file .bkse terenkripsi',
+            subtitle: 'Simpan ke Downloads atau bagikan file .bkse terenkripsi',
             color: const Color(0xFF4CAF50),
             onTap: () => _showExportSheet(context),
           ),
@@ -157,19 +160,65 @@ class _ExportSheetState extends State<_ExportSheet> {
 
     try {
       final bytes = await BackupService.exportBytes(pin);
-      final dir = await getTemporaryDirectory();
       final ts = DateTime.now().millisecondsSinceEpoch;
-      final file = File('${dir.path}/berkasKu_backup_$ts.bkse');
-      await file.writeAsBytes(bytes);
+      final fileName = 'berkasKu_backup_$ts.bkse';
+
+      // Coba simpan langsung ke lokasi pilihan user (Downloads via SAF).
+      String? savedPath;
+      try {
+        savedPath = await FilePicker.platform.saveFile(
+          dialogTitle: 'Simpan Backup',
+          fileName: fileName,
+          type: FileType.any,
+          bytes: bytes,
+        );
+      } catch (_) {
+        savedPath = null;
+      }
 
       if (!mounted) return;
+
+      // Tangkap messenger sebelum pop agar tetap valid setelah sheet ditutup.
+      final messenger = ScaffoldMessenger.of(context);
       Navigator.pop(context);
 
-      await Share.shareXFiles(
-        [XFile(file.path, mimeType: 'application/octet-stream')],
-        subject: 'BerkasKu Backup',
-        text: 'File backup terenkripsi BerkasKu — buka dengan PIN yang Anda tentukan.',
-      );
+      if (savedPath != null) {
+        // File berhasil disimpan ke lokasi pilihan user (biasanya Downloads).
+        messenger.showSnackBar(
+          SnackBar(
+            content: const Text(
+              '✅ File backup disimpan ke Downloads',
+              style: TextStyle(fontFamily: 'Poppins'),
+            ),
+            backgroundColor: const Color(0xFF4CAF50),
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'Bagikan',
+              textColor: Colors.white,
+              onPressed: () async {
+                final dir = await getTemporaryDirectory();
+                final tmp = File('${dir.path}/$fileName');
+                await tmp.writeAsBytes(bytes);
+                await Share.shareXFiles(
+                  [XFile(tmp.path, mimeType: 'application/octet-stream')],
+                  subject: 'BerkasKu Backup',
+                  text: 'File backup terenkripsi BerkasKu — buka dengan PIN yang Anda tentukan.',
+                );
+              },
+            ),
+          ),
+        );
+      } else {
+        // User membatalkan dialog SAF — fallback ke share sheet.
+        final dir = await getTemporaryDirectory();
+        final tmp = File('${dir.path}/$fileName');
+        await tmp.writeAsBytes(bytes);
+        await Share.shareXFiles(
+          [XFile(tmp.path, mimeType: 'application/octet-stream')],
+          subject: 'BerkasKu Backup',
+          text: 'File backup terenkripsi BerkasKu — buka dengan PIN yang Anda tentukan.',
+        );
+      }
     } catch (e) {
       if (mounted) setState(() => _error = 'Gagal membuat backup: $e');
     } finally {
@@ -268,7 +317,7 @@ class _ExportSheetState extends State<_ExportSheet> {
                   onPressed: _loading ? null : _doExport,
                   icon: _loading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.download_rounded),
                   label: Text(
-                    _loading ? 'Mengenkripsi...' : 'Buat & Bagikan File Backup',
+                    _loading ? 'Mengenkripsi...' : 'Simpan ke Downloads',
                     style: const TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
                   ),
                   style: FilledButton.styleFrom(
@@ -287,14 +336,14 @@ class _ExportSheetState extends State<_ExportSheet> {
 
 // ── Import Sheet ──────────────────────────────────────────────────────────────
 
-class _ImportSheet extends StatefulWidget {
+class _ImportSheet extends ConsumerStatefulWidget {
   const _ImportSheet();
 
   @override
-  State<_ImportSheet> createState() => _ImportSheetState();
+  ConsumerState<_ImportSheet> createState() => _ImportSheetState();
 }
 
-class _ImportSheetState extends State<_ImportSheet> {
+class _ImportSheetState extends ConsumerState<_ImportSheet> {
   final _pinController = TextEditingController();
   bool _obscurePin = true;
   bool _loading = false;
@@ -309,16 +358,43 @@ class _ImportSheetState extends State<_ImportSheet> {
   }
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['bkse'],
-      withData: false,
-      withReadStream: false,
-    );
-    if (result != null && result.files.isNotEmpty) {
+    FilePickerResult? result;
+    try {
+      result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['bkse'],
+        withData: false,
+        withReadStream: false,
+      );
+    } catch (_) {
+      // Ekstensi kustom tidak didukung perangkat ini (misal MIUI),
+      // fallback ke semua file agar pengguna bisa navigasi manual.
+      try {
+        result = await FilePicker.platform.pickFiles(
+          type: FileType.any,
+          withData: false,
+          withReadStream: false,
+        );
+      } catch (_) {
+        if (mounted) setState(() => _error = 'Tidak dapat membuka file picker');
+        return;
+      }
+    }
+
+    final picked = result?.files.firstOrNull;
+    if (picked != null) {
+      if (picked.path == null) {
+        if (mounted) setState(() => _error = 'Tidak dapat mengakses path file');
+        return;
+      }
+      // Validasi ekstensi secara manual jika filter tidak diterapkan
+      if (!picked.name.toLowerCase().endsWith('.bkse')) {
+        if (mounted) setState(() => _error = 'File harus berekstensi .bkse');
+        return;
+      }
       setState(() {
-        _selectedFilePath = result.files.first.path;
-        _selectedFileName = result.files.first.name;
+        _selectedFilePath = picked.path;
+        _selectedFileName = picked.name;
         _error = null;
       });
     }
@@ -345,10 +421,19 @@ class _ImportSheetState extends State<_ImportSheet> {
       final result = await BackupService.importBytes(Uint8List.fromList(bytes), pin);
 
       if (!mounted) return;
+
+      if (result.isSuccess) {
+        // Refresh in-memory state agar data yang baru diimpor langsung tampil.
+        ref.read(berkasProvider.notifier).refresh();
+        ref.read(categoryProvider.notifier).refresh();
+      }
+
+      final messenger = ScaffoldMessenger.of(context);
+      final errorColor = Theme.of(context).colorScheme.error;
       Navigator.pop(context);
 
       if (result.isSuccess) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           SnackBar(
             content: Text(
               '✅ Berhasil memulihkan ${result.berkasCount} berkas dan ${result.categoryCount} kategori',
@@ -359,10 +444,10 @@ class _ImportSheetState extends State<_ImportSheet> {
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           SnackBar(
             content: Text(result.errorMessage ?? 'Gagal', style: const TextStyle(fontFamily: 'Poppins')),
-            backgroundColor: Theme.of(context).colorScheme.error,
+            backgroundColor: errorColor,
           ),
         );
       }
