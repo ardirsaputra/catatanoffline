@@ -5,6 +5,7 @@ import '../../../shared/models/berkas_model.dart';
 import '../../../shared/utils/date_formatter.dart';
 import '../../berkas/providers/berkas_provider.dart';
 import '../../bundel/providers/bundel_provider.dart';
+import '../../export/export_options_sheet.dart';
 import '../../export/export_service.dart';
 
 class BundelDetailScreen extends ConsumerWidget {
@@ -229,6 +230,13 @@ class BundelDetailScreen extends ConsumerWidget {
       );
       return;
     }
+
+    final options = await ExportOptionsSheet.show(
+      context,
+      documentTitle: bundle.title,
+    );
+    if (options == null || !context.mounted) return;
+
     final messenger = ScaffoldMessenger.of(context);
     try {
       messenger.showSnackBar(

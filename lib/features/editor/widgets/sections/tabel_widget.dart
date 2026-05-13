@@ -6,8 +6,7 @@ class TabelWidget extends StatefulWidget {
   final SectionModel section;
   final void Function(SectionModel) onChanged;
 
-  const TabelWidget(
-      {super.key, required this.section, required this.onChanged});
+  const TabelWidget({super.key, required this.section, required this.onChanged});
 
   @override
   State<TabelWidget> createState() => _TabelWidgetState();
@@ -25,23 +24,15 @@ class _TabelWidgetState extends State<TabelWidget> {
   @override
   void initState() {
     super.initState();
-    _headers = List<String>.from(
-        widget.section.data['headers'] as List? ?? ['Kolom 1']);
-    _rows = (widget.section.data['rows'] as List? ?? [])
-        .map((row) => List<String>.from(row as List))
-        .toList();
+    _headers = List<String>.from(widget.section.data['headers'] as List? ?? ['Kolom 1']);
+    _rows = (widget.section.data['rows'] as List? ?? []).map((row) => List<String>.from(row as List)).toList();
     if (_rows.isEmpty) _rows.add(List.filled(_headers.length, ''));
     _initControllers();
   }
 
   void _initControllers() {
-    _headerControllers = _headers
-        .map((h) => TextEditingController(text: h))
-        .toList();
-    _rowControllers = _rows
-        .map((row) =>
-            row.map((cell) => TextEditingController(text: cell)).toList())
-        .toList();
+    _headerControllers = _headers.map((h) => TextEditingController(text: h)).toList();
+    _rowControllers = _rows.map((row) => row.map((cell) => TextEditingController(text: cell)).toList()).toList();
   }
 
   @override
@@ -67,8 +58,7 @@ class _TabelWidgetState extends State<TabelWidget> {
   void _addColumn() {
     setState(() {
       _headers.add('Kolom ${_headers.length + 1}');
-      _headerControllers
-          .add(TextEditingController(text: _headers.last));
+      _headerControllers.add(TextEditingController(text: _headers.last));
       for (var i = 0; i < _rows.length; i++) {
         _rows[i].add('');
         _rowControllers[i].add(TextEditingController(text: ''));
@@ -95,8 +85,7 @@ class _TabelWidgetState extends State<TabelWidget> {
   void _addRow() {
     setState(() {
       _rows.add(List.filled(_headers.length, ''));
-      _rowControllers.add(
-          List.generate(_headers.length, (_) => TextEditingController()));
+      _rowControllers.add(List.generate(_headers.length, (_) => TextEditingController()));
     });
     _update();
   }
@@ -116,8 +105,9 @@ class _TabelWidgetState extends State<TabelWidget> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    const cellWidth = 120.0;
+    const minCellWidth = 100.0;
     const cellHeight = 44.0;
+    const removeColWidth = 28.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,82 +119,81 @@ class _TabelWidgetState extends State<TabelWidget> {
               onPressed: _addColumn,
               icon: const Icon(Icons.add, size: 16),
               label: const Text('Kolom', style: TextStyle(fontSize: 12)),
-              style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 4)),
+              style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4)),
             ),
             TextButton.icon(
               onPressed: _addRow,
               icon: const Icon(Icons.add, size: 16),
               label: const Text('Baris', style: TextStyle(fontSize: 12)),
-              style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 4)),
+              style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4)),
             ),
           ],
         ),
         const SizedBox(height: 8),
-        // Scrollable table
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: IntrinsicWidth(
-            child: Column(
-              children: [
-                // Header row
-                Row(
-                  children: [
-                    ..._headers.asMap().entries.map((entry) {
-                      final colIdx = entry.key;
-                      return _buildHeaderCell(
-                        colIdx,
-                        cellWidth,
-                        cellHeight,
-                        colorScheme,
-                      );
-                    }),
-                    // Remove column button placeholder
-                    SizedBox(
-                        width: 28,
-                        height: cellHeight,
-                        child: const SizedBox()),
-                  ],
-                ),
-                // Data rows
-                ..._rows.asMap().entries.map((rowEntry) {
-                  final rowIdx = rowEntry.key;
-                  return Row(
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final colCount = _headers.length;
+            // Each column takes equal share; at least minCellWidth
+            final availableForCols = (constraints.maxWidth - removeColWidth).clamp(0.0, double.infinity);
+            final idealWidth = availableForCols / colCount;
+            final cellWidth = idealWidth < minCellWidth ? minCellWidth : idealWidth;
+            final totalWidth = cellWidth * colCount + removeColWidth;
+            final needsScroll = totalWidth > constraints.maxWidth;
+
+            Widget tableWidget = IntrinsicWidth(
+              child: Column(
+                children: [
+                  // Header row
+                  Row(
                     children: [
-                      ..._headers.asMap().entries.map((colEntry) {
-                        final colIdx = colEntry.key;
-                        return _buildDataCell(
-                            rowIdx, colIdx, cellWidth, cellHeight, colorScheme);
+                      ..._headers.asMap().entries.map((entry) {
+                        final colIdx = entry.key;
+                        return _buildHeaderCell(colIdx, cellWidth, cellHeight, colorScheme);
                       }),
-                      // Remove row button
-                      SizedBox(
-                        width: 28,
-                        height: cellHeight,
-                        child: _rows.length > 1
-                            ? IconButton(
-                                icon: Icon(Icons.remove_circle_outline,
-                                    size: 16, color: colorScheme.error),
-                                onPressed: () => _removeRow(rowIdx),
-                                padding: EdgeInsets.zero,
-                              )
-                            : const SizedBox(),
-                      ),
+                      SizedBox(width: removeColWidth, height: cellHeight),
                     ],
-                  );
-                }),
-              ],
-            ),
-          ),
+                  ),
+                  // Data rows
+                  ..._rows.asMap().entries.map((rowEntry) {
+                    final rowIdx = rowEntry.key;
+                    return Row(
+                      children: [
+                        ..._headers.asMap().entries.map((colEntry) {
+                          final colIdx = colEntry.key;
+                          return _buildDataCell(rowIdx, colIdx, cellWidth, cellHeight, colorScheme);
+                        }),
+                        SizedBox(
+                          width: removeColWidth,
+                          height: cellHeight,
+                          child: _rows.length > 1
+                              ? IconButton(
+                                  icon: Icon(Icons.remove_circle_outline, size: 16, color: colorScheme.error),
+                                  onPressed: () => _removeRow(rowIdx),
+                                  padding: EdgeInsets.zero,
+                                )
+                              : const SizedBox(),
+                        ),
+                      ],
+                    );
+                  }),
+                ],
+              ),
+            );
+
+            if (needsScroll) {
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: tableWidget,
+              );
+            }
+            return tableWidget;
+          },
         ),
       ],
     );
   }
 
-  Widget _buildHeaderCell(
-      int colIdx, double w, double h, ColorScheme cs) {
+  Widget _buildHeaderCell(int colIdx, double w, double h, ColorScheme cs) {
     return Container(
       width: w,
       height: h,
@@ -223,8 +212,7 @@ class _TabelWidgetState extends State<TabelWidget> {
                   _headers[colIdx] = v;
                   _update();
                 },
-                style: TextStyle(fontFamily: 'Poppins', 
-                    fontSize: 12, fontWeight: FontWeight.w700),
+                style: TextStyle(fontFamily: 'Poppins', fontSize: 12, fontWeight: FontWeight.w700),
                 textAlign: TextAlign.center,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
@@ -241,8 +229,7 @@ class _TabelWidgetState extends State<TabelWidget> {
               right: 0,
               child: GestureDetector(
                 onTap: () => _removeColumn(colIdx),
-                child: Icon(Icons.close,
-                    size: 12, color: cs.error),
+                child: Icon(Icons.close, size: 12, color: cs.error),
               ),
             ),
         ],
@@ -250,15 +237,12 @@ class _TabelWidgetState extends State<TabelWidget> {
     );
   }
 
-  Widget _buildDataCell(
-      int rowIdx, int colIdx, double w, double h, ColorScheme cs) {
+  Widget _buildDataCell(int rowIdx, int colIdx, double w, double h, ColorScheme cs) {
     return Container(
       width: w,
       height: h,
       decoration: BoxDecoration(
-        color: rowIdx.isEven
-            ? Colors.transparent
-            : cs.surfaceContainerHighest.withOpacity(0.3),
+        color: rowIdx.isEven ? Colors.transparent : cs.surfaceContainerHighest.withOpacity(0.3),
         border: Border.all(color: cs.outline.withOpacity(0.3)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8),

@@ -37,6 +37,29 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:scheme="berkaskyu" android:host="open_list"/>
             </intent-filter>
+            <!-- Open .docx files from file manager -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document"/>
+            </intent-filter>
+            <!-- Open .doc files from file manager -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/msword"/>
+            </intent-filter>
+            <!-- Receive shared .docx/.doc via share sheet -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/msword"/>
+            </intent-filter>
         </activity>
         <!-- Home widget provider -->
         <receiver

@@ -29,8 +29,7 @@ class EditorState {
   }
 }
 
-final editorProvider =
-    StateNotifierProvider<EditorNotifier, EditorState>((ref) {
+final editorProvider = StateNotifierProvider<EditorNotifier, EditorState>((ref) {
   return EditorNotifier(
     ref.read(berkasRepositoryProvider),
     ref,
@@ -59,8 +58,7 @@ class EditorNotifier extends StateNotifier<EditorState> {
   void updateBackground(BerkasBackground type, String value) {
     if (state.berkas == null) return;
     state = state.copyWith(
-      berkas: state.berkas!
-          .copyWith(backgroundType: type, backgroundValue: value),
+      berkas: state.berkas!.copyWith(backgroundType: type, backgroundValue: value),
       isDirty: true,
     );
   }
@@ -81,11 +79,23 @@ class EditorNotifier extends StateNotifier<EditorState> {
     );
   }
 
+  /// Appends multiple pre-built sections (e.g. from clipboard paste).
+  void addSections(List<SectionModel> newSections) {
+    if (state.berkas == null || newSections.isEmpty) return;
+    final sections = List<SectionModel>.from(state.berkas!.sections);
+    final startOrder = sections.length;
+    for (var i = 0; i < newSections.length; i++) {
+      sections.add(newSections[i].copyWith(order: startOrder + i));
+    }
+    state = state.copyWith(
+      berkas: state.berkas!.copyWith(sections: sections),
+      isDirty: true,
+    );
+  }
+
   void updateSection(SectionModel updated) {
     if (state.berkas == null) return;
-    final sections = state.berkas!.sections
-        .map((s) => s.id == updated.id ? updated : s)
-        .toList();
+    final sections = state.berkas!.sections.map((s) => s.id == updated.id ? updated : s).toList();
     state = state.copyWith(
       berkas: state.berkas!.copyWith(sections: sections),
       isDirty: true,
@@ -94,9 +104,7 @@ class EditorNotifier extends StateNotifier<EditorState> {
 
   void removeSection(String sectionId) {
     if (state.berkas == null) return;
-    final sections = state.berkas!.sections
-        .where((s) => s.id != sectionId)
-        .toList();
+    final sections = state.berkas!.sections.where((s) => s.id != sectionId).toList();
     // Re-order
     for (var i = 0; i < sections.length; i++) {
       sections[i].order = i;

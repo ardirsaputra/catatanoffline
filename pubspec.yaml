@@ -1,7 +1,7 @@
 name: notecustomseasyuse
 description: "BerkasKu - Aplikasi Berkas & Kuesioner Profesional"
 publish_to: "none"
-version: 1.0.0+1
+version: 2.0.0+2
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
@@ -56,6 +56,9 @@ dependencies:
 
   # File picker
   file_picker: ^8.0.0
+
+  # Receive shared / opened files (docx from file manager or share sheet)
+  receive_sharing_intent: ^1.8.1
 
   # Biometric authentication
   local_auth: ^2.3.0

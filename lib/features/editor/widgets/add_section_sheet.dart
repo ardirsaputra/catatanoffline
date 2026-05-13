@@ -3,8 +3,13 @@ import '../../../shared/models/section_model.dart';
 
 class AddSectionSheet extends StatelessWidget {
   final void Function(SectionType) onSelected;
+  final VoidCallback? onPasteClipboard;
 
-  const AddSectionSheet({super.key, required this.onSelected});
+  const AddSectionSheet({
+    super.key,
+    required this.onSelected,
+    this.onPasteClipboard,
+  });
 
   static const _items = [
     (SectionType.wawancara, '💬', 'Wawancara', 'Pertanyaan & jawaban wawancara'),
@@ -22,44 +27,54 @@ class AddSectionSheet extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.only(top: 8, bottom: 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            child: Row(
-              children: [
-                Text(
-                  'Tambah Bagian',
-                  style: TextStyle(fontFamily: 'Poppins', 
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: colorScheme.onSurface,
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Row(
+                children: [
+                  Text(
+                    'Tambah Bagian',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.onSurface,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const Divider(height: 1),
-          Flexible(
-            child: GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: 2,
-              childAspectRatio: 3.2,
-              padding: const EdgeInsets.all(12),
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              children: _items
-                  .map((item) => _SectionTypeCard(
+            const Divider(height: 1),
+            Flexible(
+              child: GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 2,
+                childAspectRatio: 2.2,
+                padding: const EdgeInsets.all(12),
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                children: [
+                  ..._items.map((item) => _SectionTypeCard(
                         emoji: item.$2,
                         label: item.$3,
                         subtitle: item.$4,
                         onTap: () => onSelected(item.$1),
-                      ))
-                  .toList(),
+                      )),
+                  if (onPasteClipboard != null)
+                    _SectionTypeCard(
+                      emoji: '📋',
+                      label: 'Tempel Clipboard',
+                      subtitle: 'Ubah teks yang dicopy menjadi bagian',
+                      onTap: onPasteClipboard!,
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -89,8 +104,7 @@ class _SectionTypeCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest.withOpacity(0.6),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-              color: colorScheme.outlineVariant.withOpacity(0.5)),
+          border: Border.all(color: colorScheme.outlineVariant.withOpacity(0.5)),
         ),
         child: Row(
           children: [
@@ -103,7 +117,8 @@ class _SectionTypeCard extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: TextStyle(fontFamily: 'Poppins', 
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: colorScheme.onSurface,
@@ -111,11 +126,12 @@ class _SectionTypeCard extends StatelessWidget {
                   ),
                   Text(
                     subtitle,
-                    style: TextStyle(fontFamily: 'Poppins', 
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
                       fontSize: 10,
                       color: colorScheme.onSurfaceVariant,
                     ),
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],

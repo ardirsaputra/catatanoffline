@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:archive/archive.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:share_plus/share_plus.dart';
@@ -49,15 +50,28 @@ class ExportService {
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   static Future<void> _saveAndShare(Uint8List bytes, String baseName) async {
-    final dir = await getApplicationDocumentsDirectory();
-    final exportDir = Directory(p.join(dir.path, 'exports'));
-    await exportDir.create(recursive: true);
-    final filePath = p.join(exportDir.path, '$baseName.docx');
-    await File(filePath).writeAsBytes(bytes);
-    await Share.shareXFiles(
-      [XFile(filePath, mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')],
-      subject: baseName,
-    );
+    const mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+    // Open SAF dialog so user can save directly to Downloads (or any folder).
+    String? savedPath;
+    try {
+      savedPath = await FilePicker.platform.saveFile(
+        dialogTitle: 'Simpan ke Downloads',
+        fileName: '$baseName.docx',
+        type: FileType.any,
+        bytes: bytes,
+      );
+    } catch (_) {
+      savedPath = null;
+    }
+
+    // User cancelled SAF dialog → fall back to share sheet.
+    if (savedPath == null) {
+      final dir = await getTemporaryDirectory();
+      final tmp = File(p.join(dir.path, '$baseName.docx'));
+      await tmp.writeAsBytes(bytes);
+      await Share.shareXFiles([XFile(tmp.path, mimeType: mime)], subject: baseName);
+    }
   }
 
   static String _sanitize(String name) {

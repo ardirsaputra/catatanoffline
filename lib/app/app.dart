@@ -15,6 +15,8 @@ import '../shared/models/berkas_model.dart';
 import '../features/bundel/screens/bundel_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
 import '../features/widget/widget_service.dart';
+import '../features/export/incoming_file_provider.dart';
+import '../features/export/docx_reader_screen.dart';
 
 class BerkasKuApp extends ConsumerWidget {
   const BerkasKuApp({super.key});
@@ -48,32 +50,32 @@ class BerkasKuApp extends ConsumerWidget {
         fontSize: settings.fontSize,
       ),
       themeMode: settings.darkMode ? ThemeMode.dark : ThemeMode.light,
-      home: const _TrialGate(),
+      home: const _AuthGate(), // Wrapped in trial gate to block access if trial expired
     );
   }
 }
 
-/// Blocks the app silently when the 7-day trial has expired.
-class _TrialGate extends StatelessWidget {
-  const _TrialGate();
+// /// Blocks the app silently when the 7-day trial has expired.
+// class _TrialGate extends StatelessWidget {
+//   const _TrialGate();
 
-  bool get _isExpired {
-    final box = Hive.box<String>('auth');
-    final raw = box.get('trial_start');
-    if (raw == null) return false;
-    final start = DateTime.tryParse(raw);
-    if (start == null) return false;
-    return DateTime.now().difference(start).inDays >= 14;
-  }
+//   bool get _isExpired {
+//     final box = Hive.box<String>('auth');
+//     final raw = box.get('trial_start');
+//     if (raw == null) return false;
+//     final start = DateTime.tryParse(raw);
+//     if (start == null) return false;
+//     return DateTime.now().difference(start).inDays >= 14;
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (_isExpired) {
-      return const Scaffold(backgroundColor: Colors.black);
-    }
-    return const _AuthGate();
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     if (_isExpired) {
+//       return const Scaffold(backgroundColor: Colors.black);
+//     }
+//     return const _AuthGate();
+//   }
+// }
 
 /// Shows LockScreen when a lock mode is active and user is not yet authenticated.
 class _AuthGate extends ConsumerWidget {
@@ -128,6 +130,9 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> with WidgetsBinding
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _handlePendingWidgetAction();
       _updateWidget();
+      // Open docx if app was cold-started via a Word file
+      final pendingDocx = ref.read(incomingDocxPathProvider);
+      if (pendingDocx != null) _openIncomingDocx(pendingDocx);
     });
   }
 
@@ -165,6 +170,15 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> with WidgetsBinding
     }
   }
 
+  void _openIncomingDocx(String path) {
+    if (!mounted) return;
+    ref.read(incomingDocxPathProvider.notifier).state = null;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => DocxReaderScreen(filePath: path)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final selectedTab = ref.watch(_selectedTabProvider);
@@ -178,6 +192,13 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> with WidgetsBinding
     ref.listen<String?>(pendingWidgetActionProvider, (_, action) {
       if (action != null) {
         WidgetsBinding.instance.addPostFrameCallback((_) => _handlePendingWidgetAction());
+      }
+    });
+
+    // Handle incoming .docx/.doc file from file manager / share sheet
+    ref.listen<String?>(incomingDocxPathProvider, (_, path) {
+      if (path != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _openIncomingDocx(path));
       }
     });
 

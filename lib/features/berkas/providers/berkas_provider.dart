@@ -82,6 +82,12 @@ class BerkasNotifier extends StateNotifier<List<BerkasModel>> {
 
   BerkasModel? getById(String id) => _repository.getById(id);
 
+  Future<BerkasModel> importBerkas(BerkasModel berkas) async {
+    await _repository.save(berkas);
+    state = [berkas, ...state];
+    return berkas;
+  }
+
   void refresh() {
     state = _repository.getAll();
   }

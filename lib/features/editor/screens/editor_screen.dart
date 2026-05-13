@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/models/section_model.dart';
 import '../../../shared/models/berkas_model.dart';
@@ -8,6 +9,8 @@ import '../providers/editor_provider.dart';
 import '../widgets/section_widget.dart';
 import '../widgets/add_section_sheet.dart';
 import '../widgets/background_picker_sheet.dart';
+import '../../export/clipboard_import_service.dart';
+import '../../export/export_options_sheet.dart';
 import '../../export/export_service.dart';
 import '../../settings/providers/settings_provider.dart';
 
@@ -209,8 +212,39 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           Navigator.pop(context);
           ref.read(editorProvider.notifier).addSection(type);
         },
+        onPasteClipboard: () {
+          Navigator.pop(context);
+          _pasteFromClipboard();
+        },
       ),
     );
+  }
+
+  Future<void> _pasteFromClipboard() async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text?.trim() ?? '';
+    if (!mounted) return;
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Clipboard kosong atau tidak mengandung teks')),
+      );
+      return;
+    }
+    final imported = ClipboardImportService.importFromText(text);
+    if (imported.sections.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tidak ada bagian yang dapat dikenali dari teks')),
+      );
+      return;
+    }
+    ref.read(editorProvider.notifier).addSections(imported.sections);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${imported.sections.length} bagian ditambahkan dari clipboard'),
+        ),
+      );
+    }
   }
 
   void _showBackgroundPicker(BerkasModel berkas) {
@@ -243,10 +277,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     await ref.read(editorProvider.notifier).save();
     if (!mounted) return;
 
-    // Show options dialog
-    final options = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (_) => const _ExportOptionsDialog(),
+    final options = await ExportOptionsSheet.show(
+      context,
+      documentTitle: berkas.title,
     );
     if (options == null || !mounted) return;
 
@@ -337,100 +370,6 @@ class _EmptyEditor extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _ExportOptionsDialog extends StatefulWidget {
-  const _ExportOptionsDialog();
-
-  @override
-  State<_ExportOptionsDialog> createState() => _ExportOptionsDialogState();
-}
-
-class _ExportOptionsDialogState extends State<_ExportOptionsDialog> {
-  String _orientation = 'portrait';
-  bool _includeCover = true;
-  bool _includeToc = true;
-  String _font = 'Times New Roman';
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Opsi Ekspor Word'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Orientasi Halaman', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 13)),
-            RadioListTile(
-              title: const Text('Portrait'),
-              value: 'portrait',
-              groupValue: _orientation,
-              onChanged: (v) => setState(() => _orientation = v!),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-            RadioListTile(
-              title: const Text('Landscape'),
-              value: 'landscape',
-              groupValue: _orientation,
-              onChanged: (v) => setState(() => _orientation = v!),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-            const Divider(),
-            CheckboxListTile(
-              title: const Text('Halaman Sampul'),
-              value: _includeCover,
-              onChanged: (v) => setState(() => _includeCover = v!),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-            CheckboxListTile(
-              title: const Text('Daftar Isi'),
-              value: _includeToc,
-              onChanged: (v) => setState(() => _includeToc = v!),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-            const Divider(),
-            Text('Font', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600, fontSize: 13)),
-            RadioListTile(
-              title: const Text('Times New Roman'),
-              value: 'Times New Roman',
-              groupValue: _font,
-              onChanged: (v) => setState(() => _font = v!),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-            RadioListTile(
-              title: const Text('Arial'),
-              value: 'Arial',
-              groupValue: _font,
-              onChanged: (v) => setState(() => _font = v!),
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Batal'),
-        ),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(context, {
-            'orientation': _orientation,
-            'includeCover': _includeCover,
-            'includeToc': _includeToc,
-            'font': _font,
-          }),
-          child: const Text('Export'),
-        ),
-      ],
     );
   }
 }

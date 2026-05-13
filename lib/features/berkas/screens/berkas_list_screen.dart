@@ -1,4 +1,6 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/models/berkas_model.dart';
 import '../../../shared/models/template_model.dart';
@@ -9,6 +11,8 @@ import '../providers/berkas_provider.dart';
 import '../providers/category_provider.dart';
 import '../../editor/providers/editor_provider.dart';
 import '../../editor/screens/editor_screen.dart';
+import '../../export/clipboard_import_service.dart';
+import '../../export/docx_import_service.dart';
 import '../../template/providers/template_provider.dart';
 import '../../settings/providers/settings_provider.dart';
 
@@ -105,6 +109,34 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
                   icon: Icon(isGrid ? Icons.view_list : Icons.grid_view),
                   tooltip: isGrid ? 'Tampilan Daftar' : 'Tampilan Grid',
                   onPressed: () => ref.read(settingsProvider.notifier).setDefaultView(isGrid ? 'list' : 'grid'),
+                ),
+                PopupMenuButton<String>(
+                  onSelected: (v) {
+                    if (v == 'import_word') _importFromWord();
+                    if (v == 'paste_clipboard') _importFromClipboard();
+                  },
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(
+                      value: 'import_word',
+                      child: Row(
+                        children: [
+                          Icon(Icons.upload_file_outlined, size: 20),
+                          SizedBox(width: 10),
+                          Text('Import dari Word'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'paste_clipboard',
+                      child: Row(
+                        children: [
+                          Icon(Icons.content_paste_outlined, size: 20),
+                          SizedBox(width: 10),
+                          Text('Tempel dari Clipboard'),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
               flexibleSpace: FlexibleSpaceBar(
@@ -295,6 +327,161 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
         },
       ),
     );
+  }
+
+  Future<void> _importFromClipboard() async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text?.trim() ?? '';
+    if (text.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Clipboard kosong atau tidak mengandung teks')),
+        );
+      }
+      return;
+    }
+
+    final imported = ClipboardImportService.importFromText(text);
+
+    if (!mounted) return;
+    final titleController = TextEditingController(text: imported.title);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text(
+          'Tempel dari Clipboard',
+          style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w700),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${imported.sections.length} bagian berhasil dikenali dari teks.',
+              style: const TextStyle(fontFamily: 'Poppins', fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: titleController,
+              autofocus: true,
+              decoration: const InputDecoration(
+                labelText: 'Judul Berkas',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Simpan')),
+        ],
+      ),
+    );
+    final newTitle = titleController.text.trim();
+    WidgetsBinding.instance.addPostFrameCallback((_) => titleController.dispose());
+    if (confirmed != true || !mounted) return;
+
+    final finalBerkas = imported.copyWith(title: newTitle.isEmpty ? imported.title : newTitle);
+    await ref.read(berkasProvider.notifier).importBerkas(finalBerkas);
+
+    if (!mounted) return;
+    _openEditor(finalBerkas);
+  }
+
+  Future<void> _importFromWord() async {
+    // Pick .docx file, fallback to any if extension filter not supported.
+    FilePickerResult? result;
+    try {
+      result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['docx', 'doc'],
+        withData: false,
+      );
+    } catch (_) {
+      try {
+        result = await FilePicker.platform.pickFiles(type: FileType.any, withData: false);
+      } catch (_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Tidak dapat membuka file picker')),
+          );
+        }
+        return;
+      }
+    }
+
+    final picked = result?.files.firstOrNull;
+    if (picked == null || picked.path == null) return;
+
+    final ext = picked.name.toLowerCase();
+    if (!ext.endsWith('.docx') && !ext.endsWith('.doc')) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('File harus berekstensi .docx atau .doc')),
+        );
+      }
+      return;
+    }
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Memproses file Word...')),
+    );
+
+    final imported = await DocxImportService.importFromPath(picked.path!);
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+    if (imported == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal membaca file. Pastikan file adalah .docx yang valid.')),
+      );
+      return;
+    }
+
+    // Confirm / rename title before saving.
+    final titleController = TextEditingController(text: imported.title);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Import dari Word', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w700)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${imported.sections.length} bagian berhasil dikenali dari dokumen.',
+              style: const TextStyle(fontFamily: 'Poppins', fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: titleController,
+              autofocus: true,
+              decoration: const InputDecoration(
+                labelText: 'Judul Berkas',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Simpan')),
+        ],
+      ),
+    );
+    final newTitle = titleController.text.trim();
+    titleController.dispose();
+    if (confirmed != true || !mounted) return;
+
+    final finalBerkas = imported.copyWith(title: newTitle.isEmpty ? imported.title : newTitle);
+    await ref.read(berkasProvider.notifier).importBerkas(finalBerkas);
+
+    if (!mounted) return;
+    _openEditor(finalBerkas);
   }
 
   Future<void> _confirmDelete(BerkasModel berkas) async {
