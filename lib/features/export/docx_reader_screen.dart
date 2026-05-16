@@ -124,7 +124,7 @@ class _DocxReaderScreenState extends ConsumerState<DocxReaderScreen> {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1565C0),
+        backgroundColor: colorScheme.primary,
         foregroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.white),
         title: Column(
@@ -217,11 +217,11 @@ class _DocxReaderScreenState extends ConsumerState<DocxReaderScreen> {
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFF1565C0), Color(0xFF1E88E5)],
+                colors: [colorScheme.primary, colorScheme.primaryContainer],
               ),
             ),
             child: Row(

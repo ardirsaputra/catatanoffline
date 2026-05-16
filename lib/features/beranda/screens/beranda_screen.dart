@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/models/berkas_model.dart';
@@ -7,6 +8,7 @@ import '../../berkas/providers/category_provider.dart';
 import '../../editor/screens/editor_screen.dart';
 import '../../berkas/screens/berkas_list_screen.dart';
 import '../../editor/providers/editor_provider.dart';
+import '../../export/docx_reader_screen.dart';
 
 class BerandaScreen extends ConsumerWidget {
   const BerandaScreen({super.key});
@@ -154,6 +156,12 @@ class BerandaScreen extends ConsumerWidget {
                     gradient: const [Color(0xFFFF6584), Color(0xFFFF4F7B)],
                     onTap: () => _createFromTemplate(context, ref, 'builtin_survey'),
                   ),
+                  _QuickActionCard(
+                    emoji: '📄',
+                    label: 'Buka Word',
+                    gradient: const [Color(0xFF1565C0), Color(0xFF1E88E5)],
+                    onTap: () => _openWordFile(context),
+                  ),
                 ],
               ),
             ),
@@ -249,16 +257,16 @@ class BerandaScreen extends ConsumerWidget {
       ),
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFF6C63FF),
-                Color(0xFF957FEF),
-                Color(0xFFB09FFF),
+                colorScheme.primary,
+                colorScheme.primary.withOpacity(0.8),
+                colorScheme.primaryContainer,
               ],
-              stops: [0.0, 0.5, 1.0],
+              stops: const [0.0, 0.5, 1.0],
             ),
           ),
           child: Stack(
@@ -359,6 +367,47 @@ class BerandaScreen extends ConsumerWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const BerkasListScreen(openCreateDialog: true)),
+    );
+  }
+
+  Future<void> _openWordFile(BuildContext context) async {
+    FilePickerResult? result;
+    try {
+      result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['docx', 'doc'],
+        withData: false,
+      );
+    } catch (_) {
+      try {
+        result = await FilePicker.platform.pickFiles(type: FileType.any, withData: false);
+      } catch (_) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Tidak dapat membuka file manager')),
+          );
+        }
+        return;
+      }
+    }
+
+    final picked = result?.files.firstOrNull;
+    if (picked == null || picked.path == null) return;
+
+    final ext = picked.name.toLowerCase();
+    if (!ext.endsWith('.docx') && !ext.endsWith('.doc')) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('File harus berekstensi .docx atau .doc')),
+        );
+      }
+      return;
+    }
+
+    if (!context.mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => DocxReaderScreen(filePath: picked.path!)),
     );
   }
 

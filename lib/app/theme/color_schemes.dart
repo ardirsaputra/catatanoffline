@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum AppColorScheme { biru, lavender, mint, peach, rose }
+enum AppColorScheme { biru, lavender, mint, peach, rose, sky, sage, gold, coral, lilac }
 
 class PastelPalette {
   final Color primary;
@@ -76,10 +76,59 @@ class AppColorSchemes {
       onPrimary: Color(0xFF3D3D3D),
       onBackground: Color(0xFF3D3D3D),
     ),
+    AppColorScheme.sky: PastelPalette(
+      name: 'Langit',
+      primary: Color(0xFF87CEEB),
+      secondary: Color(0xFFB0E2FF),
+      accent: Color(0xFF7EC8E3),
+      background: Color(0xFFF5FAFE),
+      surface: Color(0xFFFFFFFF),
+      onPrimary: Color(0xFF3D3D3D),
+      onBackground: Color(0xFF3D3D3D),
+    ),
+    AppColorScheme.sage: PastelPalette(
+      name: 'Sage',
+      primary: Color(0xFF9DC08B),
+      secondary: Color(0xFFBFD9B0),
+      accent: Color(0xFF8AB87A),
+      background: Color(0xFFF5FAF3),
+      surface: Color(0xFFFFFFFF),
+      onPrimary: Color(0xFF3D3D3D),
+      onBackground: Color(0xFF3D3D3D),
+    ),
+    AppColorScheme.gold: PastelPalette(
+      name: 'Emas',
+      primary: Color(0xFFFFDE80),
+      secondary: Color(0xFFFFF0B3),
+      accent: Color(0xFFFFD340),
+      background: Color(0xFFFAF9F0),
+      surface: Color(0xFFFFFFFF),
+      onPrimary: Color(0xFF3D3D3D),
+      onBackground: Color(0xFF3D3D3D),
+    ),
+    AppColorScheme.coral: PastelPalette(
+      name: 'Koral',
+      primary: Color(0xFFFF9580),
+      secondary: Color(0xFFFFBBAD),
+      accent: Color(0xFFFF7060),
+      background: Color(0xFFFAF5F5),
+      surface: Color(0xFFFFFFFF),
+      onPrimary: Color(0xFF3D3D3D),
+      onBackground: Color(0xFF3D3D3D),
+    ),
+    AppColorScheme.lilac: PastelPalette(
+      name: 'Ungu Muda',
+      primary: Color(0xFFCC99CC),
+      secondary: Color(0xFFE2C2E2),
+      accent: Color(0xFFB87BB8),
+      background: Color(0xFFFAF5FA),
+      surface: Color(0xFFFFFFFF),
+      onPrimary: Color(0xFF3D3D3D),
+      onBackground: Color(0xFF3D3D3D),
+    ),
   };
 
-  static PastelPalette getPalette(AppColorScheme scheme) =>
-      palettes[scheme] ?? palettes[AppColorScheme.biru]!;
+  static PastelPalette getPalette(AppColorScheme scheme) => palettes[scheme] ?? palettes[AppColorScheme.biru]!;
 
   static AppColorScheme fromString(String name) {
     return AppColorScheme.values.firstWhere(

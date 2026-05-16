@@ -23,7 +23,7 @@ class BundelScreen extends ConsumerWidget {
             expandedHeight: 130,
             floating: false,
             pinned: true,
-            backgroundColor: const Color(0xFF43C59E),
+            backgroundColor: colorScheme.primary,
             foregroundColor: Colors.white,
             iconTheme: const IconThemeData(color: Colors.white),
             actionsIconTheme: const IconThemeData(color: Colors.white),
@@ -44,12 +44,12 @@ class BundelScreen extends ConsumerWidget {
             ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Color(0xFF43C59E), Color(0xFF2CB5A0), Color(0xFF1A9B8A)],
-                    stops: [0.0, 0.5, 1.0],
+                    colors: [colorScheme.primary, colorScheme.primary.withOpacity(0.85), colorScheme.primaryContainer],
+                    stops: const [0.0, 0.5, 1.0],
                   ),
                 ),
                 child: Stack(
@@ -360,7 +360,7 @@ class _CreateBundelSheetState extends ConsumerState<_CreateBundelSheet> {
                   labelText: 'Judul Bundel',
                   prefixIcon: Icon(Icons.title),
                 ),
-              ),       
+              ),
               const SizedBox(height: 12),
               TextField(
                 controller: _descCtrl,

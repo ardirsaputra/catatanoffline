@@ -27,7 +27,7 @@ class SettingsScreen extends ConsumerWidget {
             expandedHeight: 130,
             floating: false,
             pinned: true,
-            backgroundColor: const Color(0xFFFF9A3C),
+            backgroundColor: colorScheme.primary,
             foregroundColor: Colors.white,
             iconTheme: const IconThemeData(color: Colors.white),
             actionsIconTheme: const IconThemeData(color: Colors.white),
@@ -37,12 +37,12 @@ class SettingsScreen extends ConsumerWidget {
             ),
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Color(0xFFFF9A3C), Color(0xFFFF6B35), Color(0xFFFF8C42)],
-                    stops: [0.0, 0.5, 1.0],
+                    colors: [colorScheme.primary, colorScheme.primary.withOpacity(0.8), colorScheme.primaryContainer],
+                    stops: const [0.0, 0.5, 1.0],
                   ),
                 ),
                 child: Stack(
@@ -368,7 +368,12 @@ class _ThemePresetTile extends StatelessWidget {
       (key: 'lavender', label: 'Lavender', color: const Color(0xFFC9B8E8)),
       (key: 'mint', label: 'Mint', color: const Color(0xFFB5EAD7)),
       (key: 'peach', label: 'Peach', color: const Color(0xFFFFDFD3)),
-      (key: 'rose', label: 'Rose', color: const Color(0xFFFFB7C5)),
+      (key: 'rose', label: 'Mawar', color: const Color(0xFFFFB7C5)),
+      (key: 'sky', label: 'Langit', color: const Color(0xFF87CEEB)),
+      (key: 'sage', label: 'Sage', color: const Color(0xFF9DC08B)),
+      (key: 'gold', label: 'Emas', color: const Color(0xFFFFDE80)),
+      (key: 'coral', label: 'Koral', color: const Color(0xFFFF9580)),
+      (key: 'lilac', label: 'Ungu Muda', color: const Color(0xFFCC99CC)),
     ];
 
     return ListTile(
@@ -378,44 +383,43 @@ class _ThemePresetTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 8),
-          Row(
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
             children: presets.map((p) {
               final selected = settings.themePreset == p.key;
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: GestureDetector(
-                  onTap: () => ref.read(settingsProvider.notifier).setTheme(p.key),
-                  child: Tooltip(
-                    message: p.label,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: p.color,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: selected ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
-                          width: 2.5,
-                        ),
-                        boxShadow: selected
-                            ? [
-                                BoxShadow(
-                                  color: p.color.withOpacity(0.5),
-                                  blurRadius: 6,
-                                  spreadRadius: 1,
-                                )
-                              ]
-                            : [],
+              return GestureDetector(
+                onTap: () => ref.read(settingsProvider.notifier).setTheme(p.key),
+                child: Tooltip(
+                  message: p.label,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: p.color,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: selected ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
+                        width: 2.5,
                       ),
-                      child: selected
-                          ? Icon(
-                              Icons.check,
-                              size: 16,
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
-                            )
-                          : null,
+                      boxShadow: selected
+                          ? [
+                              BoxShadow(
+                                color: p.color.withOpacity(0.5),
+                                blurRadius: 6,
+                                spreadRadius: 1,
+                              )
+                            ]
+                          : [],
                     ),
+                    child: selected
+                        ? Icon(
+                            Icons.check,
+                            size: 16,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                          )
+                        : null,
                   ),
                 ),
               );
@@ -865,12 +869,13 @@ class _PinSetupSheetState extends State<_PinSetupSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF6C63FF), Color(0xFF957FEF)],
+          colors: [colorScheme.primary, colorScheme.primaryContainer],
         ),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),

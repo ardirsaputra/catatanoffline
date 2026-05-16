@@ -61,16 +61,16 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6C63FF),
+        backgroundColor: colorScheme.primary,
         foregroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.white),
         actionsIconTheme: const IconThemeData(color: Colors.white),
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF6C63FF), Color(0xFF957FEF)],
+              colors: [colorScheme.primary, colorScheme.primaryContainer],
             ),
           ),
         ),

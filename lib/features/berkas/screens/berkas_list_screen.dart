@@ -13,6 +13,7 @@ import '../../editor/providers/editor_provider.dart';
 import '../../editor/screens/editor_screen.dart';
 import '../../export/clipboard_import_service.dart';
 import '../../export/docx_import_service.dart';
+import '../../export/docx_reader_screen.dart';
 import '../../template/providers/template_provider.dart';
 import '../../settings/providers/settings_provider.dart';
 
@@ -82,17 +83,17 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
               floating: false,
               pinned: true,
               forceElevated: innerScrolled,
-              backgroundColor: const Color(0xFFFFB300),
-              foregroundColor: Colors.black87,
-              iconTheme: const IconThemeData(color: Colors.black87),
-              actionsIconTheme: const IconThemeData(color: Colors.black87),
+              backgroundColor: colorScheme.primary,
+              foregroundColor: Colors.white,
+              iconTheme: const IconThemeData(color: Colors.white),
+              actionsIconTheme: const IconThemeData(color: Colors.white),
               title: const Text(
                 'Berkas',
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w700,
                   fontSize: 20,
-                  color: Colors.black87,
+                  color: Colors.white,
                 ),
               ),
               actions: [
@@ -100,7 +101,7 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
                 IconButton(
                   icon: Icon(
                     _heatmapExpanded ? Icons.grid_on : Icons.grid_off_outlined,
-                    color: _heatmapExpanded ? const Color(0xFF1B5E20) : Colors.black87,
+                    color: _heatmapExpanded ? Colors.white : Colors.white70,
                   ),
                   tooltip: 'Filter Aktivitas',
                   onPressed: () => setState(() => _heatmapExpanded = !_heatmapExpanded),
@@ -112,10 +113,21 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
                 ),
                 PopupMenuButton<String>(
                   onSelected: (v) {
+                    if (v == 'open_word') _openWordFile();
                     if (v == 'import_word') _importFromWord();
                     if (v == 'paste_clipboard') _importFromClipboard();
                   },
                   itemBuilder: (_) => const [
+                    PopupMenuItem(
+                      value: 'open_word',
+                      child: Row(
+                        children: [
+                          Icon(Icons.folder_open_outlined, size: 20),
+                          SizedBox(width: 10),
+                          Text('Buka File Word'),
+                        ],
+                      ),
+                    ),
                     PopupMenuItem(
                       value: 'import_word',
                       child: Row(
@@ -141,12 +153,12 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
               ],
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [Color(0xFFFF8F00), Color(0xFFFFB300), Color(0xFFFFD54F)],
-                      stops: [0.0, 0.5, 1.0],
+                      colors: [colorScheme.primary, colorScheme.primary.withOpacity(0.85), colorScheme.primaryContainer],
+                      stops: const [0.0, 0.5, 1.0],
                     ),
                   ),
                   child: Stack(
@@ -387,6 +399,47 @@ class _BerkasListScreenState extends ConsumerState<BerkasListScreen> {
 
     if (!mounted) return;
     _openEditor(finalBerkas);
+  }
+
+  Future<void> _openWordFile() async {
+    FilePickerResult? result;
+    try {
+      result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['docx', 'doc'],
+        withData: false,
+      );
+    } catch (_) {
+      try {
+        result = await FilePicker.platform.pickFiles(type: FileType.any, withData: false);
+      } catch (_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Tidak dapat membuka file manager')),
+          );
+        }
+        return;
+      }
+    }
+
+    final picked = result?.files.firstOrNull;
+    if (picked == null || picked.path == null) return;
+
+    final ext = picked.name.toLowerCase();
+    if (!ext.endsWith('.docx') && !ext.endsWith('.doc')) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('File harus berekstensi .docx atau .doc')),
+        );
+      }
+      return;
+    }
+
+    if (!mounted) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => DocxReaderScreen(filePath: picked.path!)),
+    );
   }
 
   Future<void> _importFromWord() async {

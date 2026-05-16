@@ -62,18 +62,19 @@ class _LockScreenState extends ConsumerState<LockScreen> with SingleTickerProvid
     final auth = ref.watch(authProvider);
     final settings = ref.watch(settingsProvider);
     final lockMode = settings.lockMode;
+    final colorScheme = Theme.of(context).colorScheme;
 
     final showPin = (lockMode == 'pin') || (lockMode == 'both' && (auth.showPinPad || !auth.biometricAvailable));
     final canSwitchToPin = lockMode == 'both' && !auth.showPinPad && auth.biometricAvailable;
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF6C63FF), Color(0xFF957FEF), Color(0xFF4A90D9)],
-            stops: [0.0, 0.5, 1.0],
+            colors: [colorScheme.primary, colorScheme.primary.withOpacity(0.8), colorScheme.primaryContainer],
+            stops: const [0.0, 0.5, 1.0],
           ),
         ),
         child: SafeArea(

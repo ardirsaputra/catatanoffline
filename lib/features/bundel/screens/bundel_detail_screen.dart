@@ -22,16 +22,16 @@ class BundelDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF43C59E),
+        backgroundColor: colorScheme.primary,
         foregroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.white),
         actionsIconTheme: const IconThemeData(color: Colors.white),
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF43C59E), Color(0xFF2CB5A0)],
+              colors: [colorScheme.primary, colorScheme.primaryContainer],
             ),
           ),
         ),
